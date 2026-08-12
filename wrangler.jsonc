@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Must match the Workers project name in the Cloudflare dashboard, or a second
+  // worker gets created instead of updating the existing one.
+  "name": "portfolio",
+  // Written by @astrojs/cloudflare. Only /keystatic and its API run here; every
+  // page of the site itself is prerendered and served from assets.
+  "main": "./dist/_worker.js/index.js",
+  // Matches the runtime bundled with the pinned wrangler; a later date silently
+  // falls back to this one anyway.
+  "compatibility_date": "2026-01-14",
+  // Keystatic's admin route needs Node built-ins on the Workers runtime.
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  "observability": { "enabled": true }
+}
