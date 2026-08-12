@@ -29,15 +29,14 @@ const prose = (label: string, description?: string) =>
   });
 
 export default config({
-  storage:
-    // Local mode while developing, GitHub mode once deployed. Set PUBLIC_KEYSTATIC_GITHUB_REPO
-    // in the Cloudflare dashboard as "owner/repo" to switch production over.
-    import.meta.env.DEV || !import.meta.env.PUBLIC_KEYSTATIC_GITHUB_REPO
-      ? { kind: 'local' }
-      : {
-          kind: 'github',
-          repo: import.meta.env.PUBLIC_KEYSTATIC_GITHUB_REPO as `${string}/${string}`,
-        },
+  // Local mode writes straight to disk in `npm run dev`. Deployed, it must be GitHub
+  // mode: a Worker has no filesystem, so local mode 500s there. Hardcoded rather than
+  // read from an env var — the setup flow at /keystatic/setup only exists in GitHub
+  // mode, so gating that mode behind a variable you configure *during* setup is a
+  // chicken-and-egg.
+  storage: import.meta.env.DEV
+    ? { kind: 'local' }
+    : { kind: 'github', repo: 'realrithvik/portfolio' },
 
   ui: {
     brand: { name: 'Rithvik — Portfolio' },

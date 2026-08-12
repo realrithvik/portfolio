@@ -91,8 +91,10 @@ Read content through `src/lib/content.ts` (`getHome`, `getProjectsSorted`, `getP
   A sixth beat needs a new SVG in code.
 - Project order comes from `src/content/site/work-order.yaml`; anything absent is appended by
   year descending, so a new project can never silently disappear.
-- Keystatic uses local mode in dev and GitHub mode in production, switched by
-  `PUBLIC_KEYSTATIC_GITHUB_REPO`.
+- Keystatic uses local mode in dev and GitHub mode in production, switched on
+  `import.meta.env.DEV`. The repo is hardcoded in `keystatic.config.ts`: local mode 500s on
+  Workers (no filesystem), and `/keystatic/setup` only exists in GitHub mode, so gating that
+  mode behind an env var configured *during* setup is circular.
 
 Astro is pinned to 5.x: `@astrojs/cloudflare` 12.x and `@astrojs/react` 4.x are the last
 Astro 5–compatible lines. Do not bump them without upgrading Astro itself.
