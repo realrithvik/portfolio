@@ -1,0 +1,37 @@
+title: Interactive HTML Brochure
+hook: A conference-ready digital brochure for Metal Power's spectrometer lineup.
+year: '2026'
+role: Interaction Designer
+tags:
+  - Interaction
+  - Axure
+  - HTML
+  - B2B
+accent: '#b835b0'
+heroImage: null
+chapters:
+  - title: The problem
+    body: |-
+      Metal Power, a spectrometer manufacturer, needed a way to showcase their different machines at national and international conferences.
+
+      A printed brochure couldn't demonstrate capability. A static PDF couldn't invite exploration. Visitors at a booth needed something they could interact with — immediately.
+  - title: The insight
+    body: |-
+      An interactive HTML brochure could travel to any conference, run on any screen, and let visitors explore the full machine range at their own pace.
+
+      The format had to feel polished enough for a global manufacturer, but flexible enough to update as the product line evolved.
+  - title: The process
+    body: |-
+      I designed a high-fidelity HTML package in Axure, supported by custom code snippets written with the help of AI.
+
+      Each machine needed clear hierarchy, readable specs, and smooth navigation — designed for someone standing at a booth with only a few minutes of attention.
+  - title: The outcome
+    body: |-
+      The result is a deployable HTML package built for conference use — interactive, portable, and ready to showcase Metal Power's spectrometer range on screen.
+
+      It bridges the gap between a sales sheet and a product demo: informative, engaging, and reusable across events.
+  - title: The dot
+    body: |-
+      Design doesn't have to stop at the visual. When the audience is standing in front of a screen, interaction becomes part of the story.
+
+      This was my first real step into code-adjacent design — and it showed me how much more welcoming a brochure feels when you can explore it yourself.

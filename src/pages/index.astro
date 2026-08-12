@@ -4,17 +4,13 @@ import ThoughtProcess from '../components/ThoughtProcess.astro';
 import ScrollArrowCTA from '../components/ScrollArrowCTA.astro';
 import Fireflies from '../components/Fireflies.astro';
 import FireflyJar from '../components/FireflyJar.astro';
-import { getProjectsSorted } from '../data/projects';
+import { getHome, getProjectsSorted, renderInline } from '../lib/content';
 
-const featured = getProjectsSorted().slice(0, 3);
+const home = await getHome();
+const featured = await getProjectsSorted();
 
-const capabilities = [
-  { title: 'Editorial & print', note: 'Books, brochures, and folded objects that reward handling.' },
-  { title: 'Typography', note: 'Type as the argument — weight, rhythm, spacing, and silence.' },
-  { title: 'Brand & identity', note: 'Systems built from a single idea, carried across every touchpoint.' },
-  { title: 'Interaction', note: 'Prototypes and interactive documents people can explore themselves.' },
-  { title: 'Research', note: 'Months of it, when the concept depends on getting the story right.' },
-];
+const cardNumber = (index: number) => String(index + 1).padStart(2, '0');
+const workIntro = home.workIntro.replace('{count}', String(featured.length));
 ---
 
 <PageLayout
@@ -27,11 +23,16 @@ const capabilities = [
   <section id="hero" class="hero">
     <div class="hero__center container">
       <div class="hero__intro">
-        <h1 class="hero__name" aria-label="Hi! I'm Rithvik, pronounced Ri-thvik">
-          Hi! I&rsquo;m{' '}
+        <h1
+          class="hero__name"
+          aria-label={`${home.greeting} ${home.nameSpoken}, pronounced ${home.pronunciation}`}
+        >
+          {home.greeting}{' '}
           <span class="hero__name-word" tabindex="0">
-            <span class="hero__pronounce" aria-hidden="true">Ri&#8209;thvik</span>
-            <span class="hero__letter-r">R</span><span class="hero__thought-anchor">
+            <span class="hero__pronounce" aria-hidden="true">
+              {home.pronunciation.replace('-', '‑')}
+            </span>
+            <span class="hero__letter-r">{home.nameLead}</span><span class="hero__thought-anchor">
               <button
                 type="button"
                 id="thought-trigger"
@@ -49,17 +50,23 @@ const capabilities = [
                 <span class="hero__dot-trigger-ring" aria-hidden="true"></span>
                 <span class="hero__dot-trigger-mark" aria-hidden="true"></span>
               </button>
-            </span>thvik
+            </span>{home.nameRest}
           </span>
         </h1>
 
         <p class="hero__tagline">
-          I design stories through shape, type, and interaction.<br />
-          Every story starts from a single dot.
+          {
+            home.tagline.split('\n').map((line, i) => (
+              <>
+                {i > 0 && <br />}
+                {line}
+              </>
+            ))
+          }
         </p>
 
         <p class="hero__hint" id="hero-hint" hidden>
-          <em>the dot has a story</em>
+          <em>{home.dotHint}</em>
         </p>
       </div>
     </div>
@@ -73,61 +80,60 @@ const capabilities = [
 
   <section id="work" class="page-section container home-work">
     <div class="home-work__intro">
-      <h2 class="page-title">Selected work</h2>
-      <p class="page-intro">Three projects, told as stories. Click any one to scroll through.</p>
+      <h2 class="page-title">{home.workTitle}</h2>
+      <p class="page-intro">{featured.length ? workIntro : home.workEmpty}</p>
     </div>
 
-    <div class="work-grid" role="list">
-      {
-        featured.map((project, index) => (
-          <a
-            href={`/projects/${project.slug}`}
-            class="work-card"
-            role="listitem"
-            style={`--card-accent: ${project.accent}`}
-          >
-            <div class="work-card__image">
-              <img
-                src={`/images/${project.slug}/hero.jpg`}
-                alt={project.title}
-                class="work-card__img"
-                loading="lazy"
-              />
-              <div class="work-card__placeholder" aria-hidden="true">
-                <span class="work-card__ph-index">0{index + 1}</span>
-                <span class="work-card__ph-rule"></span>
-                <span class="work-card__ph-word">{project.tags[0]}</span>
+    {
+      featured.length > 0 && (
+        <div class="work-grid" role="list">
+          {featured.map((project, index) => (
+            <a
+              href={`/projects/${project.slug}`}
+              class="work-card"
+              role="listitem"
+              style={`--card-accent: ${project.accent}`}
+            >
+              <div class="work-card__image">
+                <img
+                  src={project.heroImage ?? `/images/${project.slug}/hero.jpg`}
+                  alt={project.title}
+                  class="work-card__img"
+                  loading="lazy"
+                />
+                <div class="work-card__placeholder" aria-hidden="true">
+                  <span class="work-card__ph-index">{cardNumber(index)}</span>
+                  <span class="work-card__ph-rule" />
+                  <span class="work-card__ph-word">{project.tags[0]}</span>
+                </div>
+                <div class="work-card__mono" aria-hidden="true" />
               </div>
-              <div class="work-card__mono" aria-hidden="true"></div>
-            </div>
 
-            <div class="work-card__body">
-              <span class="work-card__number">0{index + 1}</span>
-              <h3>{project.title}</h3>
-              <p class="work-card__hook">{project.hook}</p>
-              <div class="work-card__meta">
-                <span class="tag">{project.year}</span>
-                <span class="tag">{project.role}</span>
+              <div class="work-card__body">
+                <span class="work-card__number">{cardNumber(index)}</span>
+                <h3>{project.title}</h3>
+                <p class="work-card__hook">{project.hook}</p>
+                <div class="work-card__meta">
+                  <span class="tag">{project.year}</span>
+                  <span class="tag">{project.role}</span>
+                </div>
               </div>
-            </div>
-          </a>
-        ))
-      }
-    </div>
+            </a>
+          ))}
+        </div>
+      )
+    }
   </section>
 
   <section id="capabilities" class="page-section container capabilities">
     <div class="capabilities__intro">
-      <h2 class="page-title">What I do</h2>
-      <p class="page-intro">
-        A communication designer working across print and screen — usually starting with research,
-        always ending with a story.
-      </p>
+      <h2 class="page-title">{home.capabilitiesTitle}</h2>
+      <p class="page-intro">{home.capabilitiesIntro}</p>
     </div>
 
     <ul class="capabilities__list">
       {
-        capabilities.map((item) => (
+        home.capabilities.map((item) => (
           <li class="capability">
             <span class="dot" aria-hidden="true"></span>
             <div>
@@ -141,11 +147,8 @@ const capabilities = [
   </section>
 
   <section class="page-section container bio-strip">
-    <p class="bio-strip__text">
-      There's a dot under the <strong>R</strong> in my name. It's the smallest mark that still
-      carries meaning — and it's where every project here starts.
-    </p>
-    <a href="/about" class="btn">Read the whole story</a>
+    <p class="bio-strip__text" set:html={renderInline(home.bioText)} />
+    <a href="/about" class="btn">{home.bioLinkLabel}</a>
   </section>
 </PageLayout>
 

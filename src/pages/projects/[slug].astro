@@ -1,22 +1,23 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
 import StoryChapter from '../../components/StoryChapter.astro';
-import { getProject, getProjectsSorted } from '../../data/projects';
+import { chapterId, getProject, getProjectsSorted } from '../../lib/content';
 
-export function getStaticPaths() {
-  return getProjectsSorted().map((project) => ({
+export async function getStaticPaths() {
+  const projects = await getProjectsSorted();
+  return projects.map((project) => ({
     params: { slug: project.slug },
   }));
 }
 
 const { slug } = Astro.params;
-const project = getProject(slug!);
+const project = await getProject(slug!);
 
 if (!project) {
   return Astro.redirect('/');
 }
 
-const heroImage = `/images/${project.slug}/hero.jpg`;
+const heroImage = project.heroImage ?? `/images/${project.slug}/hero.jpg`;
 ---
 
 <PageLayout title={`${project.title} — Rithvik A Koundinya`} description={project.hook}>
@@ -55,7 +56,7 @@ const heroImage = `/images/${project.slug}/hero.jpg`;
         project.chapters.map((chapter, index) => (
           <StoryChapter
             index={index}
-            id={chapter.id}
+            id={chapterId(chapter.title, index)}
             title={chapter.title}
             body={chapter.body}
             projectSlug={project.slug}

@@ -1,15 +1,16 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import { getContact } from '../lib/content';
+
+const contact = await getContact();
 ---
 
 <PageLayout title="Contact — Rithvik A Koundinya" description="Get in touch with Rithvik A Koundinya.">
   <section class="page-section container container--narrow">
-    <h1 class="page-title">Say hello</h1>
-    <p class="page-intro">
-      Have a project in mind, or just want to chat about design? I'd love to hear from you.
-    </p>
+    <h1 class="page-title">{contact.title}</h1>
+    <p class="page-intro">{contact.intro}</p>
 
-    <form class="contact-form" action="mailto:rithvik.koundinya@gmail.com" method="post" enctype="text/plain">
+    <form class="contact-form" action={`mailto:${contact.email}`} method="post" enctype="text/plain">
       <label>
         Your name
         <input type="text" name="name" required placeholder="What should I call you?" />
@@ -24,12 +25,12 @@ import PageLayout from '../layouts/PageLayout.astro';
       </label>
       <button type="submit" class="btn btn--accent">
         <span class="dot" aria-hidden="true"></span>
-        Send message
+        {contact.submitLabel}
       </button>
     </form>
 
     <p class="contact-aside">
-      Or email directly: <a href="mailto:rithvik.koundinya@gmail.com">rithvik.koundinya@gmail.com</a>
+      {contact.asidePrefix} <a href={`mailto:${contact.email}`}>{contact.email}</a>
     </p>
   </section>
 </PageLayout>

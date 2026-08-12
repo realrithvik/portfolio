@@ -1,5 +1,3 @@
-import { skillPhrases } from '../data/skills';
-
 const STORAGE_KEY = 'portfolio-firefly-count';
 const MAX_ACTIVE = 4;
 const SPAWN_MIN_MS = 3000;
@@ -661,13 +659,25 @@ function quadBezier(p0: number, p1: number, p2: number, t: number) {
   return inv * inv * p0 + 2 * inv * t * p1 + t * t * p2;
 }
 
+/** Authored in the CMS and handed over by Fireflies.astro as a data attribute. */
+function readPhrases(): string[] {
+  const raw = field?.dataset.phrases ?? '';
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((p): p is string => typeof p === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
 /**
  * A shuffled deck rather than a random pick: random repeats within two or three
  * catches, which reads as a bug and kills the sense that there's more to find.
  */
 function shufflePhraseDeck() {
   const last = phraseDeck[phraseDeck.length - 1];
-  const next = [...skillPhrases];
+  const next = readPhrases();
 
   for (let i = next.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -854,6 +864,9 @@ export function initFireflies() {
   clearPhrases();
 
   field = el;
+  // Re-read the deck so edited phrases take effect after a navigation.
+  phraseDeck = [];
+  phraseIndex = 0;
   reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   updateFireflyJar(getFireflyCount());
   initJarVisibility();

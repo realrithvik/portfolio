@@ -1,36 +1,20 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import { getAbout, paragraphs, renderInline } from '../lib/content';
+
+const about = await getAbout();
 ---
 
 <PageLayout title="About — Rithvik A Koundinya" description="About Rithvik A Koundinya and the dot.">
   <section class="page-section container container--narrow">
-    <h1 class="page-title">About the dot</h1>
+    <h1 class="page-title">{about.title}</h1>
 
     <div class="prose">
-      <p>
-        In my name — <strong>Ṛithvik</strong> — there is a dot under the R.
-        It's a small mark, easy to miss. But it's part of who I am, and it became the idea behind this portfolio.
-      </p>
-
-      <p>
-        A dot is a beginning. A full stop. A point on a timeline. In design, it's the smallest unit that still
-        carries meaning — a shape, a pause, a place to rest your eye.
-      </p>
-
-      <p>
-        I'm a designer drawn to how forms carry feeling — whether that's the emotional language of shape in
-        horology, the negative space between letterforms on a folded brochure, or the interaction that welcomes
-        someone at a conference booth.
-      </p>
-
-      <p>
-        This site is project-based because that's how I think: each piece of work is a story with a beginning,
-        a turn, and something that lingers. I hope it feels warm here. Pull up a chair.
-      </p>
+      {paragraphs(about.body).map((p) => <p set:html={renderInline(p)} />)}
     </div>
 
     <div class="page-actions">
-      <a href="/contact" class="btn btn--accent">Say hello</a>
+      <a href="/contact" class="btn btn--accent">{about.ctaLabel}</a>
     </div>
   </section>
 </PageLayout>

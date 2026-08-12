@@ -1,8 +1,14 @@
+---
+import { getContact } from '../lib/content';
+
+const { email } = await getContact();
+---
+
 <footer class="site-footer">
   <div class="container site-footer__inner">
     <p>© {new Date().getFullYear()} Rithvik A Koundinya</p>
     <p>
-      <a href="mailto:rithvik.koundinya@gmail.com">rithvik.koundinya@gmail.com</a>
+      <a href={`mailto:${email}`}>{email}</a>
     </p>
   </div>
 </footer>

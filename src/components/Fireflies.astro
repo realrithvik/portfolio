@@ -1,7 +1,18 @@
 ---
+import { getFireflyPhrases } from '../lib/content';
+
+// fireflies.ts runs in the browser and cannot import astro:content, so the phrases
+// ride along as a data attribute instead.
+const phrases = await getFireflyPhrases();
 ---
 
-<div id="firefly-field" class="firefly-field" aria-hidden="true"></div>
+<div
+  id="firefly-field"
+  class="firefly-field"
+  aria-hidden="true"
+  data-phrases={JSON.stringify(phrases)}
+>
+</div>
 
 <script>
   import { destroyFireflies, initFireflies } from '../lib/fireflies';

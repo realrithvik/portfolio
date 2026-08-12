@@ -1,8 +1,9 @@
 ---
-import { thoughtBeats } from '../data/thoughtProcess';
 import ScrollArrowCTA from './ScrollArrowCTA.astro';
 import ThoughtIcons from './ThoughtIcons.astro';
+import { getThoughtBeats } from '../lib/content';
 
+const thoughtBeats = await getThoughtBeats();
 const totalSteps = thoughtBeats.length + 2; // intro + beats + CTA
 ---
 
@@ -45,7 +46,7 @@ const totalSteps = thoughtBeats.length + 2; // intro + beats + CTA
               thoughtBeats.map((beat) => (
                 <article class="thought-box">
                   <div class="thought-box__icon" aria-hidden="true">
-                    <ThoughtIcons name={beat.id} />
+                    <ThoughtIcons name={beat.icon} />
                   </div>
                   <div class="thought-box__copy">
                     <h2 class="thought-box__title">{beat.title}</h2>

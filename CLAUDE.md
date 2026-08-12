@@ -14,9 +14,9 @@ one correct wide read, because it buys a second round trip *and* a wrong answer.
 - **Locate before reading.** Grep for the symbol, then `Read` with `offset` ~30 lines above
   the hit and a `limit` that covers it. Do not scroll a file looking for something.
 - Files over ~200 lines: always pass `offset`/`limit`. Widen only if the symbol you need
-  isn't in range. In this repo that means `src/styles/global.css` (1.8k lines),
+  isn't in range. In this repo that means `src/styles/global.css` (2.2k lines),
   `src/lib/fireflies.ts`, `src/lib/thoughtProcess.ts`, `src/lib/backgroundDots.ts`,
-  `src/pages/index.astro`. Everything else is small — just read it.
+  `src/pages/index.astro`, `keystatic.config.ts`. Everything else is small — just read it.
 - **Exception — read whole files** when correctness depends on absence: dead-code hunts,
   "is this class/var/prop used anywhere", refactor audits, cleanup passes. Partial reads
   produce confidently wrong answers here. Grep for usage counts first; read fully only the
@@ -67,13 +67,41 @@ has. A multi-part task is not a reason to spawn.
 
 - Hero + dot trigger: `src/pages/index.astro`; all styling in `src/styles/global.css`
 - Thought overlay: `ThoughtProcess.astro`, `lib/thoughtProcess.ts`, `lib/thoughtLine.ts`
-- Projects: `src/data/projects.ts` (content source of truth) → `pages/projects/[slug].astro`
 - Shared: `lib/imageFallback.ts` — every project `<img>` pairs with a sibling placeholder
 - Ambient: `lib/fireflies.ts`, `lib/backgroundDots.ts`
 
+## Content is CMS-owned — do not hardcode copy
+
+All words and images live in YAML under `src/content/`, edited via Keystatic at `/keystatic`.
+**Never put user-facing copy in `.astro` files.** Adding a field means touching three places:
+
+1. `keystatic.config.ts` — the editing UI (root of repo)
+2. `src/content.config.ts` — the Zod schema Astro validates at build time
+3. `src/content/**.yaml` — the value itself
+
+Read content through `src/lib/content.ts` (`getHome`, `getProjectsSorted`, `getProject`,
+`getThoughtBeats`, `renderInline`, `paragraphs`). All are async — Astro frontmatter only.
+
+- Prose fields support `**bold**` via `renderInline()`, which escapes HTML first. Use with
+  `set:html`.
+- `src/lib/fireflies.ts` runs in the browser and **cannot** import `astro:content`. Its phrases
+  arrive as a `data-phrases` JSON attribute set by `Fireflies.astro`. Same pattern for any other
+  client-side content.
+- Thought beats pick an icon by `select`; the five values map to SVGs in `ThoughtIcons.astro`.
+  A sixth beat needs a new SVG in code.
+- Project order comes from `src/content/site/work-order.yaml`; anything absent is appended by
+  year descending, so a new project can never silently disappear.
+- Keystatic uses local mode in dev and GitHub mode in production, switched by
+  `PUBLIC_KEYSTATIC_GITHUB_REPO`.
+
+Astro is pinned to 5.x: `@astrojs/cloudflare` 12.x and `@astrojs/react` 4.x are the last
+Astro 5–compatible lines. Do not bump them without upgrading Astro itself.
+
 ## Known open items
 
-- Hero dot should sit tight under the **R** in "Rithvik" (currently under the following gap)
 - Contact form posts to `mailto:` — silently blocked by modern browsers; needs a real handler
-- `/about` exists but isn't linked from nav
-- `astro.config.mjs` `site` is a placeholder domain
+  (Cloudflare has no built-in forms)
+- `astro.config.mjs` `site` is a placeholder domain; repo has no remote and is undeployed
+- Keystatic GitHub mode not yet wired — needs the repo on GitHub and a GitHub App
+- No og:/twitter meta tags
+- `npm audit` reports 7 high advisories, all requiring Astro 7 (`@astrojs/cloudflare` 14.x)

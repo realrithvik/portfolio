@@ -1,0 +1,31 @@
+greeting: Hi! I’m
+nameLead: R
+nameRest: thvik
+nameSpoken: Rithvik
+pronunciation: Ri-thvik
+tagline: |-
+  I design stories through shape, type, and interaction.
+  Every story starts from a single dot.
+dotHint: the dot has a story
+workTitle: Selected work
+workIntro: '{count} projects, told as stories. Click any one to scroll through.'
+workEmpty: New work is on its way.
+capabilitiesTitle: What I do
+capabilitiesIntro: >-
+  A communication designer working across print and screen — usually starting with
+  research, always ending with a story.
+capabilities:
+  - title: Editorial & print
+    note: Books, brochures, and folded objects that reward handling.
+  - title: Typography
+    note: Type as the argument — weight, rhythm, spacing, and silence.
+  - title: Brand & identity
+    note: Systems built from a single idea, carried across every touchpoint.
+  - title: Interaction
+    note: Prototypes and interactive documents people can explore themselves.
+  - title: Research
+    note: Months of it, when the concept depends on getting the story right.
+bioText: >-
+  There's a dot under the **R** in my name. It's the smallest mark that still
+  carries meaning — and it's where every project here starts.
+bioLinkLabel: Read the whole story
