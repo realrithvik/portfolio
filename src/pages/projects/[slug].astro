@@ -1,0 +1,81 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import StoryChapter from '../../components/StoryChapter.astro';
+import { getProject, getProjectsSorted } from '../../data/projects';
+
+export function getStaticPaths() {
+  return getProjectsSorted().map((project) => ({
+    params: { slug: project.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const project = getProject(slug!);
+
+if (!project) {
+  return Astro.redirect('/');
+}
+
+const heroImage = `/images/${project.slug}/hero.jpg`;
+---
+
+<PageLayout title={`${project.title} — Rithvik A Koundinya`} description={project.hook}>
+  <div class="project-story">
+    <header class="project-hero">
+      <div class="project-hero__image">
+        <img
+          src={heroImage}
+          alt={project.title}
+          class="project-hero__img"
+          loading="eager"
+        />
+        <div class="project-hero__image-placeholder" aria-hidden="true">
+          <span>{project.title}</span>
+        </div>
+      </div>
+
+      <div class="project-hero__content">
+        <a href="/#work" class="btn">← Back to work</a>
+        <h1 class="page-title">{project.title}</h1>
+        <div class="project-hero__meta">
+          <span class="tag">{project.year}</span>
+          <span class="tag">{project.role}</span>
+          {
+            project.tags.map((tag) => (
+              <span class="tag">{tag}</span>
+            ))
+          }
+        </div>
+        <p class="project-hero__hook">{project.hook}</p>
+      </div>
+    </header>
+
+    <div class="story">
+      {
+        project.chapters.map((chapter, index) => (
+          <StoryChapter
+            index={index}
+            id={chapter.id}
+            title={chapter.title}
+            body={chapter.body}
+            projectSlug={project.slug}
+          />
+        ))
+      }
+    </div>
+
+    <section class="project-outro">
+      <p>That's the story. Ready for the next one?</p>
+      <a href="/#work" class="btn btn--accent">Explore more work</a>
+    </section>
+  </div>
+</PageLayout>
+
+<script>
+  import { initImageFallbacks } from '../../lib/imageFallback';
+
+  const init = () => initImageFallbacks('.project-hero__img');
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

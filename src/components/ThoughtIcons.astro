@@ -1,0 +1,91 @@
+---
+interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+---
+
+{
+  name === 'read' && (
+    <svg class="thought-box__icon-svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+      <ellipse class="thought-icon__stroke" cx="60" cy="60" rx="38" ry="22" stroke="currentColor" stroke-width="3" />
+      <circle class="thought-icon__stroke" cx="60" cy="60" r="12" stroke="currentColor" stroke-width="3" />
+      <circle class="thought-icon__stroke" cx="60" cy="60" r="3.5" stroke="currentColor" stroke-width="3" />
+    </svg>
+  )
+}
+
+{
+  name === 'empathize' && (
+    <svg class="thought-box__icon-svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+      <path
+        class="thought-icon__stroke"
+        d="M60 98 C60 98 22 74 22 48 C22 34 32 26 44 26 C52 26 57 30 60 36 C63 30 68 26 76 26 C88 26 98 34 98 48 C98 74 60 98 60 98 Z"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+}
+
+{
+  name === 'define' && (
+    <svg class="thought-box__icon-svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+      <circle class="thought-icon__stroke" cx="60" cy="60" r="34" stroke="currentColor" stroke-width="3" />
+      <path
+        class="thought-icon__stroke"
+        d="M60 26 L68 52 L96 52 L74 68 L82 94 L60 78 L38 94 L46 68 L24 52 L52 52 Z"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linejoin="round"
+      />
+    </svg>
+  )
+}
+
+{
+  name === 'shape' && (
+    <svg class="thought-box__icon-svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+      <path
+        class="thought-icon__stroke"
+        d="M60 18 L102 94 H18 Z"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linejoin="round"
+      />
+      <circle class="thought-icon__stroke" cx="60" cy="64" r="16" stroke="currentColor" stroke-width="3" />
+    </svg>
+  )
+}
+
+{
+  name === 'tell' && (
+    <svg class="thought-box__icon-svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+      <path
+        class="thought-icon__stroke"
+        d="M28 34 H78 C90 34 98 42 98 54 V66 C98 78 90 86 78 86 H52 L34 102 V86 H28 C20 86 14 78 14 70 V50 C14 42 20 34 28 34 Z"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linejoin="round"
+      />
+      <path class="thought-icon__stroke" d="M38 58 H70" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+      <path class="thought-icon__stroke" d="M38 70 H58" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+    </svg>
+  )
+}
+
+{
+  name === 'cta' && (
+    <svg class="thought-box__icon-svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+      <circle class="thought-icon__stroke" cx="60" cy="60" r="10" stroke="currentColor" stroke-width="3" />
+      <circle class="thought-icon__stroke" cx="60" cy="60" r="28" stroke="currentColor" stroke-width="3" />
+      <circle class="thought-icon__stroke" cx="60" cy="60" r="44" stroke="currentColor" stroke-width="2.5" />
+      <path class="thought-icon__stroke" d="M60 14 V28" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+      <path class="thought-icon__stroke" d="M60 92 V106" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+      <path class="thought-icon__stroke" d="M14 60 H28" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+      <path class="thought-icon__stroke" d="M92 60 H106" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+    </svg>
+  )
+}

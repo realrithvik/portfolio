@@ -1,0 +1,41 @@
+---
+description: Rithvik portfolio — stack, brand, structure, and open design work
+alwaysApply: true
+---
+
+# Portfolio (Rithvik)
+
+Astro 5 + TypeScript + vanilla JS. Designer-owned; prefer direct code iteration.
+
+## Brand
+
+- Navy `#15173D`, purple `#982598`, pink `#E491C9`, cream `#F1E9E9`, yellow `#E8C96B`
+- Fonts: Erode (serif display), Recia (body) — CSS vars `--font-serif` / `--font-sans`
+- Avoid generic AI looks (purple-on-white, cream+terracotta, broadsheet)
+
+## Key paths
+
+- Hero: `src/pages/index.astro`, styles in `src/styles/global.css`
+- Thought overlay: `ThoughtProcess.astro`, `src/lib/thoughtProcess.ts`, `thoughtLine.ts`
+- Projects: `src/data/projects.ts`, `src/pages/projects/[slug].astro`
+- Shell: `Header.astro`, `PageLayout.astro`, `BaseLayout.astro`
+
+## Hero intent (open)
+
+- Name: **Hi! I’m Rithvik** — cream interactive **dot under the R** opens thought process
+- Sketch CTA **how I think** with hand-drawn arrow tip aimed at the cream mark
+- Dot should sit tight under R (not under “it”); sketch should feel attached, not floating
+- Header logo is **dot only** (no name text)
+
+## Run
+
+```bash
+npm run dev
+```
+
+Default: http://localhost:4321
+
+## Notes
+
+- Git `main` may have **no commits yet** (all files untracked)
+- Remove leftover debug `agent log` / ingest `fetch` instrumentation in `index.astro` if still present

@@ -1,0 +1,31 @@
+---
+const navItems: { href: string; label: string; homeOnly?: boolean }[] = [
+  { href: '/#work', label: 'Work', homeOnly: true },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const currentPath = Astro.url.pathname;
+
+const isCurrent = (item: (typeof navItems)[number]) =>
+  item.homeOnly
+    ? currentPath === '/'
+    : currentPath === item.href || currentPath.startsWith(`${item.href}/`);
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="/" class="site-logo" aria-label="Rithvik — Home">
+      <span class="dot dot--lg dot--pulse" aria-hidden="true"></span>
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      {
+        navItems.map((item) => (
+          <a href={item.href} aria-current={isCurrent(item) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,61 @@
+---
+---
+
+<div class="glow-cursor" id="glow-cursor" aria-hidden="true">
+  {/* Hoop and handle — a mesh net turns to mush at this size. Revealed near a firefly. */}
+  <svg class="glow-cursor__net" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <circle class="glow-cursor__net-hoop" cx="32" cy="32" r="20" />
+    <path class="glow-cursor__net-bag" d="M15 38c4 8 10 12 17 12s13-4 17-12" />
+    <path class="glow-cursor__net-handle" d="M32 52v10" />
+  </svg>
+</div>
+
+<script>
+  let cursorInitialized = false;
+
+  function initGlowCursor() {
+    const cursor = document.getElementById('glow-cursor');
+    if (!cursor) return;
+
+    const prefersFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!prefersFinePointer) {
+      cursor.style.display = 'none';
+      return;
+    }
+
+    document.body.classList.add('has-glow-cursor');
+
+    if (!cursorInitialized) {
+      cursorInitialized = true;
+
+      let mouseX = 0;
+      let mouseY = 0;
+      let cursorX = 0;
+      let cursorY = 0;
+
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      function animate() {
+        cursorX += (mouseX - cursorX) * 0.18;
+        cursorY += (mouseY - cursorY) * 0.18;
+        cursor.style.left = `${cursorX}px`;
+        cursor.style.top = `${cursorY}px`;
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+
+      document.body.addEventListener('mouseover', (e) => {
+        const target = e.target as HTMLElement;
+        const interactive = target.closest('a, button, .btn, input, textarea');
+        cursor.classList.toggle('is-hovering', Boolean(interactive));
+      });
+    }
+  }
+
+  initGlowCursor();
+  document.addEventListener('astro:page-load', initGlowCursor);
+</script>

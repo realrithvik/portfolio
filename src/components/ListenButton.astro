@@ -1,0 +1,71 @@
+---
+interface Props {
+  chapterId: string;
+  text: string;
+}
+
+const { chapterId, text } = Astro.props;
+---
+
+<button
+  type="button"
+  class="btn listen-btn"
+  data-chapter-id={chapterId}
+  data-text={text}
+  aria-label="Listen to this section"
+>
+  <span class="dot" aria-hidden="true"></span>
+  <span class="listen-btn__label">Listen</span>
+</button>
+
+<script>
+  let currentButton: HTMLButtonElement | null = null;
+
+  function setButtonState(button: HTMLButtonElement, playing: boolean) {
+    button.classList.toggle('is-playing', playing);
+    const label = button.querySelector('.listen-btn__label');
+    if (label) label.textContent = playing ? 'Pause' : 'Listen';
+  }
+
+  function stopSpeech() {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+    if (currentButton) {
+      setButtonState(currentButton, false);
+      currentButton = null;
+    }
+  }
+
+  function initListenButtons() {
+    document.querySelectorAll<HTMLButtonElement>('.listen-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        const text = button.dataset.text;
+        if (!text) return;
+
+        const wasPlaying = button.classList.contains('is-playing');
+        stopSpeech();
+        if (wasPlaying) return;
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+
+        const reset = () => {
+          setButtonState(button, false);
+          if (currentButton === button) currentButton = null;
+        };
+
+        utterance.onend = reset;
+        utterance.onerror = reset;
+
+        currentButton = button;
+        setButtonState(button, true);
+        window.speechSynthesis.speak(utterance);
+      });
+    });
+  }
+
+  initListenButtons();
+  document.addEventListener('astro:page-load', initListenButtons);
+</script>

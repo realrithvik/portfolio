@@ -1,0 +1,12 @@
+---
+---
+
+<div id="firefly-field" class="firefly-field" aria-hidden="true"></div>
+
+<script>
+  import { destroyFireflies, initFireflies } from '../lib/fireflies';
+
+  initFireflies();
+  document.addEventListener('astro:page-load', initFireflies);
+  document.addEventListener('astro:before-swap', destroyFireflies);
+</script>

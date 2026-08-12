@@ -1,0 +1,32 @@
+---
+interface Props {
+  href: string;
+  label?: string;
+  explore?: boolean;
+  /** Stacks the arrow above the label (visual order only — DOM order is unchanged). */
+  arrowFirst?: boolean;
+}
+
+const { href, label = 'Selected work', explore = false, arrowFirst = false } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    'scroll-arrow-cta',
+    explore && 'scroll-arrow-cta--explore',
+    arrowFirst && 'scroll-arrow-cta--arrow-first',
+  ]}
+>
+  <span class="scroll-arrow-cta__label">{label}</span>
+  <span class="scroll-arrow-cta__arrow" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+      <path
+        d="M14 6v14M14 20l-6-6M14 20l6-6"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </span>
+</a>

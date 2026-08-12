@@ -1,0 +1,32 @@
+---
+---
+
+<button
+  type="button"
+  id="firefly-jar"
+  class="firefly-jar"
+  aria-label="0 fireflies collected"
+  disabled
+>
+  <img
+    class="firefly-jar__shape"
+    src="/images/firefly-jar.png"
+    alt=""
+    width="80"
+    height="100"
+    aria-hidden="true"
+  />
+  <div id="firefly-jar-dots" class="firefly-jar__dots" aria-hidden="true"></div>
+  <span id="firefly-jar-badge" class="firefly-jar__badge" hidden aria-live="polite"></span>
+</button>
+
+<script>
+  import { getFireflyCount, initFireflyJar, updateFireflyJar } from '../lib/fireflies';
+
+  updateFireflyJar(getFireflyCount());
+  initFireflyJar();
+  document.addEventListener('astro:page-load', () => {
+    updateFireflyJar(getFireflyCount());
+    initFireflyJar();
+  });
+</script>

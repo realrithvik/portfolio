@@ -1,0 +1,24 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BackgroundDots from '../components/BackgroundDots.astro';
+import GlowCursor from '../components/GlowCursor.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <BackgroundDots />
+  <GlowCursor />
+  <Header />
+  <main class="main-content">
+    <slot />
+  </main>
+  <Footer />
+</BaseLayout>

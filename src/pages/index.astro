@@ -1,0 +1,395 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import ThoughtProcess from '../components/ThoughtProcess.astro';
+import ScrollArrowCTA from '../components/ScrollArrowCTA.astro';
+import Fireflies from '../components/Fireflies.astro';
+import FireflyJar from '../components/FireflyJar.astro';
+import { getProjectsSorted } from '../data/projects';
+
+const featured = getProjectsSorted().slice(0, 3);
+
+const capabilities = [
+  { title: 'Editorial & print', note: 'Books, brochures, and folded objects that reward handling.' },
+  { title: 'Typography', note: 'Type as the argument — weight, rhythm, spacing, and silence.' },
+  { title: 'Brand & identity', note: 'Systems built from a single idea, carried across every touchpoint.' },
+  { title: 'Interaction', note: 'Prototypes and interactive documents people can explore themselves.' },
+  { title: 'Research', note: 'Months of it, when the concept depends on getting the story right.' },
+];
+---
+
+<PageLayout
+  title="Rithvik A Koundinya — Designer"
+  description="A warm, story-driven design portfolio."
+>
+  <Fireflies />
+  <FireflyJar />
+
+  <section id="hero" class="hero">
+    <div class="hero__center container">
+      <div class="hero__intro">
+        <h1 class="hero__name" aria-label="Hi! I'm Rithvik, pronounced Ri-thvik">
+          Hi! I&rsquo;m{' '}
+          <span class="hero__name-word" tabindex="0">
+            <span class="hero__pronounce" aria-hidden="true">Ri&#8209;thvik</span>
+            <span class="hero__letter-r">R</span><span class="hero__thought-anchor">
+              <button
+                type="button"
+                id="thought-trigger"
+                class="hero__dot-trigger"
+                aria-label="See how I think"
+                aria-expanded="false"
+                aria-controls="thought-process"
+              >
+                <span class="hero__dot-trigger-glow" aria-hidden="true"></span>
+                <span class="hero__dot-trigger-ripples" aria-hidden="true">
+                  <span class="hero__dot-trigger-ripple"></span>
+                  <span class="hero__dot-trigger-ripple"></span>
+                  <span class="hero__dot-trigger-ripple"></span>
+                </span>
+                <span class="hero__dot-trigger-ring" aria-hidden="true"></span>
+                <span class="hero__dot-trigger-mark" aria-hidden="true"></span>
+              </button>
+            </span>thvik
+          </span>
+        </h1>
+
+        <p class="hero__tagline">
+          I design stories through shape, type, and interaction.<br />
+          Every story starts from a single dot.
+        </p>
+
+        <p class="hero__hint" id="hero-hint" hidden>
+          <em>the dot has a story</em>
+        </p>
+      </div>
+    </div>
+
+    <div class="hero__bottom">
+      <ScrollArrowCTA href="#work" label="Explore work" explore arrowFirst />
+    </div>
+  </section>
+
+  <ThoughtProcess />
+
+  <section id="work" class="page-section container home-work">
+    <div class="home-work__intro">
+      <h2 class="page-title">Selected work</h2>
+      <p class="page-intro">Three projects, told as stories. Click any one to scroll through.</p>
+    </div>
+
+    <div class="work-grid" role="list">
+      {
+        featured.map((project, index) => (
+          <a
+            href={`/projects/${project.slug}`}
+            class="work-card"
+            role="listitem"
+            style={`--card-accent: ${project.accent}`}
+          >
+            <div class="work-card__image">
+              <img
+                src={`/images/${project.slug}/hero.jpg`}
+                alt={project.title}
+                class="work-card__img"
+                loading="lazy"
+              />
+              <div class="work-card__placeholder" aria-hidden="true">
+                <span class="work-card__ph-index">0{index + 1}</span>
+                <span class="work-card__ph-rule"></span>
+                <span class="work-card__ph-word">{project.tags[0]}</span>
+              </div>
+              <div class="work-card__mono" aria-hidden="true"></div>
+            </div>
+
+            <div class="work-card__body">
+              <span class="work-card__number">0{index + 1}</span>
+              <h3>{project.title}</h3>
+              <p class="work-card__hook">{project.hook}</p>
+              <div class="work-card__meta">
+                <span class="tag">{project.year}</span>
+                <span class="tag">{project.role}</span>
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section id="capabilities" class="page-section container capabilities">
+    <div class="capabilities__intro">
+      <h2 class="page-title">What I do</h2>
+      <p class="page-intro">
+        A communication designer working across print and screen — usually starting with research,
+        always ending with a story.
+      </p>
+    </div>
+
+    <ul class="capabilities__list">
+      {
+        capabilities.map((item) => (
+          <li class="capability">
+            <span class="dot" aria-hidden="true"></span>
+            <div>
+              <h3 class="capability__title">{item.title}</h3>
+              <p class="capability__note">{item.note}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="page-section container bio-strip">
+    <p class="bio-strip__text">
+      There's a dot under the <strong>R</strong> in my name. It's the smallest mark that still
+      carries meaning — and it's where every project here starts.
+    </p>
+    <a href="/about" class="btn">Read the whole story</a>
+  </section>
+</PageLayout>
+
+<script>
+  import { initImageFallbacks } from '../lib/imageFallback';
+
+  const initWorkCardImages = () => initImageFallbacks('.work-card__img');
+
+  initWorkCardImages();
+  document.addEventListener('astro:page-load', initWorkCardImages);
+
+  function measureRCharBox(letterR: HTMLElement) {
+    const textNode = letterR.firstChild;
+    if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return null;
+    const range = document.createRange();
+    range.setStart(textNode, 0);
+    range.setEnd(textNode, 1);
+    return range.getBoundingClientRect();
+  }
+
+  /**
+   * A Range's rect spans the whole line box, so its bottom sits well below the
+   * glyph. A zero-size inline-block aligned to the baseline reports the real
+   * baseline Y in its top edge — that's what the dot hangs from.
+   */
+  function measureBaselineY(letterR: HTMLElement) {
+    const probe = document.createElement('span');
+    probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+    letterR.after(probe);
+    const baselineY = probe.getBoundingClientRect().top;
+    probe.remove();
+    return baselineY;
+  }
+
+  function alignDotToR() {
+    const nameWord = document.querySelector<HTMLElement>('.hero__name-word');
+    const letterR = document.querySelector<HTMLElement>('.hero__letter-r');
+    const anchor = document.querySelector<HTMLElement>('.hero__thought-anchor');
+    const mark = document.querySelector<HTMLElement>('.hero__dot-trigger-mark');
+    if (!nameWord || !letterR || !anchor || !mark) return;
+
+    const rCharBox = measureRCharBox(letterR);
+    if (!rCharBox) return;
+
+    const wordBox = nameWord.getBoundingClientRect();
+    const anchorWidth = anchor.offsetWidth;
+    const rCenterX = rCharBox.left + rCharBox.width * 0.5;
+    const fontSize = parseFloat(getComputedStyle(letterR).fontSize) || 16;
+    const gapBelowBaseline = fontSize * 0.08;
+    const markSize = mark.getBoundingClientRect().height || anchorWidth * 0.48;
+    const targetMarkCy = measureBaselineY(letterR) + gapBelowBaseline + markSize / 2;
+
+    anchor.style.left = `${rCenterX - wordBox.left - anchorWidth / 2}px`;
+    anchor.style.top = `${targetMarkCy - wordBox.top - anchor.offsetHeight / 2}px`;
+    anchor.style.transform = 'none';
+    anchor.style.marginTop = '0';
+  }
+
+  function initHeroDotLayout() {
+    const run = () => requestAnimationFrame(() => alignDotToR());
+    const fontsReady = document.fonts?.ready ?? Promise.resolve();
+    fontsReady.then(() => {
+      run();
+      window.setTimeout(run, 600);
+    });
+  }
+
+  let heroIntroDimInit = false;
+
+  function setTextDim(value: number) {
+    document.documentElement.style.setProperty('--text-dim', String(Math.max(0, Math.min(1, value))));
+  }
+
+  function initHeroIntroDim() {
+    if (heroIntroDimInit) return;
+    heroIntroDimInit = true;
+
+    const intro = document.querySelector<HTMLElement>('.hero__intro');
+    const anchor = document.querySelector<HTMLElement>('.hero__thought-anchor');
+    if (!intro) return;
+
+    const updateTextDim = (event: MouseEvent) => {
+      if (!anchor) {
+        setTextDim(1);
+        return;
+      }
+
+      const introRect = intro.getBoundingClientRect();
+      const x = event.clientX;
+      const y = event.clientY;
+
+      if (
+        x < introRect.left ||
+        x > introRect.right ||
+        y < introRect.top ||
+        y > introRect.bottom
+      ) {
+        setTextDim(0);
+        return;
+      }
+
+      const anchorRect = anchor.getBoundingClientRect();
+      const dotCx = anchorRect.left + anchorRect.width / 2;
+      const dotCy = anchorRect.top + anchorRect.height / 2;
+      const maxDist = Math.hypot(introRect.width, introRect.height) * 0.58;
+      const dist = Math.hypot(x - dotCx, y - dotCy);
+      const proximity = Math.max(0, Math.min(1, 1 - dist / maxDist));
+      const eased = proximity * proximity;
+      const dim = 0.28 + eased * 0.72;
+
+      setTextDim(dim);
+    };
+
+    intro.addEventListener('mousemove', updateTextDim, { passive: true });
+    intro.addEventListener('mouseleave', () => setTextDim(0));
+  }
+
+  let heroDotProximityInit = false;
+
+  function initHeroDotProximity() {
+    if (heroDotProximityInit) return;
+    heroDotProximityInit = true;
+
+    const anchor = document.querySelector<HTMLElement>('.hero__thought-anchor');
+    if (!anchor) return;
+
+    const threshold = 100;
+    let ticking = false;
+
+    document.addEventListener(
+      'mousemove',
+      (event) => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          const rect = anchor.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const distance = Math.hypot(event.clientX - cx, event.clientY - cy);
+          const isNear = distance < threshold;
+          anchor.classList.toggle('is-near', isNear);
+          ticking = false;
+        });
+      },
+      { passive: true },
+    );
+  }
+
+  let heroDotResizeTimer = 0;
+  window.addEventListener(
+    'resize',
+    () => {
+      window.clearTimeout(heroDotResizeTimer);
+      heroDotResizeTimer = window.setTimeout(initHeroDotLayout, 80);
+    },
+    { passive: true },
+  );
+
+  initHeroDotLayout();
+  initHeroIntroDim();
+  initHeroDotProximity();
+  document.addEventListener('astro:page-load', initHeroDotLayout);
+
+  function initHeroScrollCta() {
+    const heroBottom = document.querySelector<HTMLElement>('.hero__bottom');
+    if (!heroBottom) return;
+
+    const threshold = 48;
+
+    const update = () => {
+      heroBottom.classList.toggle('is-scrolled-away', window.scrollY > threshold);
+    };
+
+    let ticking = false;
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          update();
+          ticking = false;
+        });
+      },
+      { passive: true },
+    );
+
+    update();
+  }
+
+  initHeroScrollCta();
+  document.addEventListener('astro:page-load', initHeroScrollCta);
+
+  // The dot opens the thought overlay, but nothing says so. Nudge once, then
+  // never again — mirrors the localStorage guard in lib/fireflies.ts.
+  const HINT_SEEN_KEY = 'portfolio-thought-seen';
+
+  function hintAlreadySeen() {
+    try {
+      return localStorage.getItem(HINT_SEEN_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  }
+
+  let hintListenersBound = false;
+
+  function initHeroHint() {
+    const hint = document.getElementById('hero-hint');
+    const trigger = document.getElementById('thought-trigger');
+    if (!hint || !trigger) return;
+
+    if (hintAlreadySeen()) {
+      hint.hidden = true;
+      return;
+    }
+
+    hint.hidden = false;
+    window.setTimeout(() => hint.classList.add('is-visible'), 1200);
+
+    if (hintListenersBound) return;
+    hintListenersBound = true;
+
+    const observer = new MutationObserver(() => {
+      if (document.body.classList.contains('thought-open')) dismissHint();
+    });
+
+    function dismissHint() {
+      try {
+        localStorage.setItem(HINT_SEEN_KEY, 'true');
+      } catch {
+        /* ignore */
+      }
+      observer.disconnect();
+      hint!.classList.remove('is-visible');
+      window.setTimeout(() => {
+        hint!.hidden = true;
+      }, 400);
+    }
+
+    trigger.addEventListener('click', dismissHint, { once: true });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  initHeroHint();
+  document.addEventListener('astro:page-load', initHeroHint);
+</script>

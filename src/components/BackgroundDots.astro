@@ -1,0 +1,23 @@
+---
+---
+
+<canvas id="bg-dots-canvas" class="bg-dots" aria-hidden="true"></canvas>
+
+<script>
+  import { destroyBackgroundDots, initBackgroundDots } from '../lib/backgroundDots';
+
+  initBackgroundDots();
+  document.addEventListener('astro:page-load', initBackgroundDots);
+  document.addEventListener('astro:before-swap', destroyBackgroundDots);
+</script>
+
+<style>
+  .bg-dots {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+</style>

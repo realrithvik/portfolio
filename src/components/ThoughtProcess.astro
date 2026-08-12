@@ -1,0 +1,77 @@
+---
+import { thoughtBeats } from '../data/thoughtProcess';
+import ScrollArrowCTA from './ScrollArrowCTA.astro';
+import ThoughtIcons from './ThoughtIcons.astro';
+
+const totalSteps = thoughtBeats.length + 2; // intro + beats + CTA
+---
+
+<div id="thought-expand" class="thought-expand" aria-hidden="true">
+  <div class="thought-expand__orb"></div>
+</div>
+
+<section
+  id="thought-process"
+  class="thought-overlay"
+  aria-hidden="true"
+  hidden
+>
+  <div class="thought-overlay__scroller">
+    <div class="thought-overlay__scroll-room" style={`--beat-count: ${totalSteps}`}>
+      <div class="thought-overlay__pin">
+        <p class="thought-overlay__intro">Everything starts from a dot.</p>
+
+        <svg class="thought-overlay__line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path
+            class="thought-overlay__line-path"
+            d=""
+            fill="none"
+            stroke="url(#thought-line-gradient)"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            vector-effect="non-scaling-stroke"></path>
+          <defs>
+            <linearGradient id="thought-line-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#15173d"></stop>
+              <stop offset="50%" stop-color="#982598"></stop>
+              <stop offset="100%" stop-color="#15173d"></stop>
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <div class="thought-overlay__viewport">
+          <div class="thought-overlay__track">
+            {
+              thoughtBeats.map((beat) => (
+                <article class="thought-box">
+                  <div class="thought-box__icon" aria-hidden="true">
+                    <ThoughtIcons name={beat.id} />
+                  </div>
+                  <div class="thought-box__copy">
+                    <h2 class="thought-box__title">{beat.title}</h2>
+                    <p class="thought-box__body">{beat.body}</p>
+                  </div>
+                </article>
+              ))
+            }
+
+            <article class="thought-box thought-box--cta">
+              <div class="thought-box__icon" aria-hidden="true">
+                <ThoughtIcons name="cta" />
+              </div>
+              <p class="thought-box__cta-text">Every project is a story — ready to read mine?</p>
+              <ScrollArrowCTA href="#work" label="Selected work" />
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initThoughtProcess } from '../lib/thoughtProcess';
+
+  initThoughtProcess();
+  document.addEventListener('astro:page-load', initThoughtProcess);
+</script>

@@ -1,0 +1,66 @@
+---
+import ListenButton from './ListenButton.astro';
+
+interface Props {
+  index: number;
+  id: string;
+  title: string;
+  body: string;
+  projectSlug: string;
+}
+
+const { index, id, title, body, projectSlug } = Astro.props;
+const chapterNumber = String(index + 1).padStart(2, '0');
+const plainText = body.replace(/\n\n/g, ' ').trim();
+const imagePath = `/images/${projectSlug}/${id}.jpg`;
+---
+
+<article class="chapter" id={id} data-chapter={id}>
+  <div class="chapter__layout">
+    <div class="chapter__visual">
+      <div class="chapter__image-wrap">
+        <img
+          src={imagePath}
+          alt={`${title} — visual`}
+          class="chapter__image"
+          loading="lazy"
+        />
+        <div class="chapter__image-placeholder">
+          <span class="chapter__placeholder-label">{title}</span>
+          <span class="chapter__placeholder-hint">public/images/{projectSlug}/{id}.jpg</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter__content">
+      <div class="chapter__content-inner">
+        <div class="chapter__header">
+          <span class="chapter__number">
+            <span class="dot" aria-hidden="true"></span>
+            Chapter {chapterNumber}
+          </span>
+          <ListenButton chapterId={`${projectSlug}-${id}`} text={plainText} />
+        </div>
+
+        <h2 class="chapter__title">{title}</h2>
+
+        <div class="chapter__body">
+          {
+            body.split('\n\n').map((paragraph) => (
+              <p>{paragraph}</p>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<script>
+  import { initImageFallbacks } from '../lib/imageFallback';
+
+  const init = () => initImageFallbacks('.chapter__image');
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
