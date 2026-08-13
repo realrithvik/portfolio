@@ -34,7 +34,24 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* No scroll-behavior here on purpose: Lenis (src/lib/smoothScroll.ts) owns
+     window scrolling, and native smooth scrolling fights it. Reduced-motion
+     users get no Lenis and instant jumps, which is the correct behaviour. */
+  scroll-behavior: auto;
+}
+
+/* Lenis sets these on <html> while it is driving the scroll. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 body {

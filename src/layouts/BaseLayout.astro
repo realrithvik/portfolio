@@ -29,5 +29,13 @@ const {
   </head>
   <body>
     <slot />
+
+    <script>
+      import { destroySmoothScroll, initSmoothScroll } from '../lib/smoothScroll';
+
+      initSmoothScroll();
+      document.addEventListener('astro:page-load', initSmoothScroll);
+      document.addEventListener('astro:before-swap', destroySmoothScroll);
+    </script>
   </body>
 </html>
