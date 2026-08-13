@@ -1,4 +1,4 @@
-greeting: Hi! I’m
+greeting: Hello! I'm
 nameLead: R
 nameRest: thvik
 nameSpoken: Rithvik
@@ -12,8 +12,8 @@ workIntro: '{count} projects, told as stories. Click any one to scroll through.'
 workEmpty: New work is on its way.
 capabilitiesTitle: What I do
 capabilitiesIntro: >-
-  A communication designer working across print and screen — usually starting with
-  research, always ending with a story.
+  A communication designer working across print and screen — usually starting
+  with research, always ending with a story.
 capabilities:
   - title: Editorial & print
     note: Books, brochures, and folded objects that reward handling.
