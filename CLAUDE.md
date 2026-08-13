@@ -96,6 +96,24 @@ Read content through `src/lib/content.ts` (`getHome`, `getProjectsSorted`, `getP
   Workers (no filesystem), and `/keystatic/setup` only exists in GitHub mode, so gating that
   mode behind an env var configured *during* setup is circular.
 
+### Deployment gotchas (all cost real time once)
+
+- **The GitHub App must have user-to-server token expiration ENABLED**
+  (Optional Features tab). Keystatic validates the token response against a schema requiring
+  `refresh_token` and `refresh_token_expires_in`, which GitHub omits when expiry is off.
+  Validation throws and surfaces as a generic `Authorization failed` — the *same* string it
+  uses for genuinely bad credentials, so the message is not diagnostic.
+- **Secrets changed in the Cloudflare dashboard do not reach the serving Worker until the
+  next deploy**, because the Worker is published by CI. Force one with
+  `git commit --allow-empty -m redeploy && git push`.
+- Keystatic reads credentials from `locals.runtime.env` first, so they belong in
+  **Settings → Variables and Secrets** (runtime), not Build variables. `PUBLIC_*` vars are the
+  opposite — inlined at build time — which is why the app slug is baked into
+  `astro.config.mjs` via a vite `define` instead.
+- To distinguish bad credentials from other OAuth failures, POST to
+  `https://github.com/login/oauth/access_token` with the real id/secret and a junk code:
+  `bad_verification_code` means the pair is valid, `incorrect_client_credentials` means it is not.
+
 Astro is pinned to 5.x: `@astrojs/cloudflare` 12.x and `@astrojs/react` 4.x are the last
 Astro 5–compatible lines. Do not bump them without upgrading Astro itself.
 
