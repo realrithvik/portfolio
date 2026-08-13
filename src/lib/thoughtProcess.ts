@@ -31,6 +31,7 @@ export function initThoughtProcess() {
   let maxTranslate = 0;
   let currentStep = 0;
   let isOpening = false;
+  let expandFallbackTimer = 0;
   let isSnapping = false;
   let snapTimer = 0;
   let edgeRubber = 0;
@@ -348,12 +349,18 @@ export function initThoughtProcess() {
     expand.setAttribute('aria-hidden', 'false');
     expand.classList.add('is-active');
 
-    requestAnimationFrame(() => {
-      expand.classList.add('is-expanding');
-    });
+    // Force a reflow so the browser records the pre-transition transform. Batched
+    // with is-expanding it can skip the transition entirely, and then transitionend
+    // never fires.
+    void expandOrb.offsetWidth;
+    expand.classList.add('is-expanding');
 
-    const onExpanded = (event: TransitionEvent) => {
-      if (event.target !== expandOrb || event.propertyName !== 'transform') return;
+    let finished = false;
+
+    const finishOpen = () => {
+      if (finished) return;
+      finished = true;
+      window.clearTimeout(expandFallbackTimer);
       expandOrb.removeEventListener('transitionend', onExpanded);
 
       section.hidden = false;
@@ -379,7 +386,20 @@ export function initThoughtProcess() {
       isOpening = false;
     };
 
+    const onExpanded = (event: TransitionEvent) => {
+      if (event.target !== expandOrb || event.propertyName !== 'transform') return;
+      finishOpen();
+    };
+
     expandOrb.addEventListener('transitionend', onExpanded);
+
+    /**
+     * The whole open used to hang off that one event. When it does not fire — a
+     * dropped transition on a huge composited layer, a backgrounded tab — the
+     * overlay never opens *and* the expand layer stays over the trigger, so no
+     * further click can get through. Slightly longer than the 0.9s transition.
+     */
+    expandFallbackTimer = window.setTimeout(finishOpen, 1200);
   };
 
   const close = () => {
@@ -388,6 +408,11 @@ export function initThoughtProcess() {
     loopRunning = false;
     cancelAnimationFrame(rafId);
     window.clearTimeout(snapTimer);
+    window.clearTimeout(expandFallbackTimer);
+    isOpening = false;
+    // Never leave the expand layer up: it covers the trigger and blocks reopening.
+    expand.classList.remove('is-expanding', 'is-active');
+    expand.setAttribute('aria-hidden', 'true');
 
     section.classList.remove('is-visible');
     section.hidden = true;

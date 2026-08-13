@@ -1,53 +1,79 @@
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
 /**
  * Builds one continuous path that travels around the screen
  * (top → right → bottom → left), staying out of the center text band.
  * Coordinates are in CSS pixels for the current viewport.
+ *
+ * Corners are explicit arcs rather than a side effect of the edge curves. An
+ * earlier version bowed the sides by a fraction of the *width*, which collapsed
+ * to a few pixels on a phone while the top and bottom waves kept their full
+ * amplitude — the sides went flat, the corners turned into sharp kinks, and the
+ * loop read as broken rather than drawn.
  */
 export function buildThoughtLinePath(width: number, height: number) {
   const w = Math.max(width, 320);
   const h = Math.max(height, 480);
   const isMobile = w < 720;
 
-  const insetX = isMobile ? w * 0.06 : w * 0.04;
+  const insetX = isMobile ? w * 0.05 : w * 0.04;
   const topY = isMobile ? h * 0.11 : h * 0.1;
   const botY = isMobile ? h * 0.89 : h * 0.9;
-  const midRight = w - insetX;
-  const midLeft = insetX;
+  const right = w - insetX;
+  const left = insetX;
 
-  // Wave control points along top (left → right)
-  const t1 = w * 0.22;
-  const t2 = w * 0.5;
-  const t3 = w * 0.78;
-  const topAmp = isMobile ? h * 0.035 : h * 0.045;
+  // Corner radius from the *smaller* axis so it survives a narrow viewport.
+  const r = clamp(Math.min(w, h) * 0.08, 26, 96);
+  // Outward bow on the vertical edges, with a floor so it never goes flat.
+  const bow = Math.max(w * 0.018, 12);
+  const amp = isMobile ? h * 0.03 : h * 0.045;
 
-  // Wave control points along bottom (right → left)
-  const b1 = w * 0.78;
-  const b2 = w * 0.5;
-  const b3 = w * 0.22;
-  const botAmp = isMobile ? h * 0.035 : h * 0.045;
+  const startX = left + r;
+  const endX = right - r;
+  const span = endX - startX;
+  const lead = span * 0.12;
 
-  // Right edge mid, left edge mid
-  const rightMidY = h * 0.5;
-  const leftMidY = h * 0.5;
+  // Wave crests along the horizontal runs
+  const t1 = startX + span * 0.25;
+  const t2 = startX + span * 0.5;
+  const t3 = startX + span * 0.75;
+
+  const vTop = topY + r;
+  const vBot = botY - r;
+  const vSpan = vBot - vTop;
+
+  const n = (value: number) => value.toFixed(1);
 
   return [
-    `M ${midLeft.toFixed(1)} ${topY.toFixed(1)}`,
-    // Top edge wave, left → right
-    `C ${(midLeft + t1) / 2} ${(topY - topAmp).toFixed(1)}, ${t1.toFixed(1)} ${(topY + topAmp).toFixed(1)}, ${t1.toFixed(1)} ${topY.toFixed(1)}`,
-    `S ${t2.toFixed(1)} ${(topY - topAmp).toFixed(1)}, ${t2.toFixed(1)} ${topY.toFixed(1)}`,
-    `S ${t3.toFixed(1)} ${(topY + topAmp).toFixed(1)}, ${t3.toFixed(1)} ${topY.toFixed(1)}`,
-    `S ${((t3 + midRight) / 2).toFixed(1)} ${(topY - topAmp * 0.6).toFixed(1)}, ${midRight.toFixed(1)} ${topY.toFixed(1)}`,
-    // Right edge, top → bottom (curves around the text)
-    `C ${(midRight + w * 0.02).toFixed(1)} ${(topY + h * 0.12).toFixed(1)}, ${(midRight + w * 0.02).toFixed(1)} ${(rightMidY - h * 0.08).toFixed(1)}, ${midRight.toFixed(1)} ${rightMidY.toFixed(1)}`,
-    `C ${(midRight + w * 0.02).toFixed(1)} ${(rightMidY + h * 0.08).toFixed(1)}, ${(midRight + w * 0.02).toFixed(1)} ${(botY - h * 0.12).toFixed(1)}, ${midRight.toFixed(1)} ${botY.toFixed(1)}`,
-    // Bottom edge wave, right → left
-    `C ${((midRight + b1) / 2).toFixed(1)} ${(botY + botAmp).toFixed(1)}, ${b1.toFixed(1)} ${(botY - botAmp).toFixed(1)}, ${b1.toFixed(1)} ${botY.toFixed(1)}`,
-    `S ${b2.toFixed(1)} ${(botY + botAmp).toFixed(1)}, ${b2.toFixed(1)} ${botY.toFixed(1)}`,
-    `S ${b3.toFixed(1)} ${(botY - botAmp).toFixed(1)}, ${b3.toFixed(1)} ${botY.toFixed(1)}`,
-    `S ${((b3 + midLeft) / 2).toFixed(1)} ${(botY + botAmp * 0.6).toFixed(1)}, ${midLeft.toFixed(1)} ${botY.toFixed(1)}`,
-    // Left edge, bottom → top — finishes near the start
-    `C ${(midLeft - w * 0.02).toFixed(1)} ${(botY - h * 0.12).toFixed(1)}, ${(midLeft - w * 0.02).toFixed(1)} ${(leftMidY + h * 0.08).toFixed(1)}, ${midLeft.toFixed(1)} ${leftMidY.toFixed(1)}`,
-    `C ${(midLeft - w * 0.02).toFixed(1)} ${(leftMidY - h * 0.08).toFixed(1)}, ${(midLeft - w * 0.02).toFixed(1)} ${(topY + h * 0.12).toFixed(1)}, ${midLeft.toFixed(1)} ${topY.toFixed(1)}`,
+    `M ${n(startX)} ${n(topY)}`,
+
+    // Top edge, left → right
+    `C ${n(startX + lead)} ${n(topY - amp)}, ${n(t1 - lead)} ${n(topY + amp)}, ${n(t1)} ${n(topY)}`,
+    `S ${n(t2 - lead)} ${n(topY - amp)}, ${n(t2)} ${n(topY)}`,
+    `S ${n(t3 - lead)} ${n(topY + amp)}, ${n(t3)} ${n(topY)}`,
+    `S ${n(endX - lead)} ${n(topY - amp * 0.6)}, ${n(endX)} ${n(topY)}`,
+
+    // Top-right corner
+    `Q ${n(right)} ${n(topY)}, ${n(right)} ${n(vTop)}`,
+    // Right edge, bowed outward
+    `C ${n(right + bow)} ${n(vTop + vSpan * 0.33)}, ${n(right + bow)} ${n(vBot - vSpan * 0.33)}, ${n(right)} ${n(vBot)}`,
+    // Bottom-right corner
+    `Q ${n(right)} ${n(botY)}, ${n(endX)} ${n(botY)}`,
+
+    // Bottom edge, right → left
+    `C ${n(endX - lead)} ${n(botY + amp)}, ${n(t3 + lead)} ${n(botY - amp)}, ${n(t3)} ${n(botY)}`,
+    `S ${n(t2 + lead)} ${n(botY + amp)}, ${n(t2)} ${n(botY)}`,
+    `S ${n(t1 + lead)} ${n(botY - amp)}, ${n(t1)} ${n(botY)}`,
+    `S ${n(startX + lead)} ${n(botY + amp * 0.6)}, ${n(startX)} ${n(botY)}`,
+
+    // Bottom-left corner
+    `Q ${n(left)} ${n(botY)}, ${n(left)} ${n(vBot)}`,
+    // Left edge, bowed outward
+    `C ${n(left - bow)} ${n(vBot - vSpan * 0.33)}, ${n(left - bow)} ${n(vTop + vSpan * 0.33)}, ${n(left)} ${n(vTop)}`,
+    // Top-left corner, closing on the start point
+    `Q ${n(left)} ${n(topY)}, ${n(startX)} ${n(topY)}`,
   ].join(' ');
 }
 
