@@ -121,7 +121,5 @@ Astro 5–compatible lines. Do not bump them without upgrading Astro itself.
 
 - Contact form posts to `mailto:` — silently blocked by modern browsers; needs a real handler
   (Cloudflare has no built-in forms)
-- `astro.config.mjs` `site` is a placeholder domain; repo has no remote and is undeployed
-- Keystatic GitHub mode not yet wired — needs the repo on GitHub and a GitHub App
-- No og:/twitter meta tags
+- No og:/twitter meta tags, so shared links preview blank
 - `npm audit` reports 7 high advisories, all requiring Astro 7 (`@astrojs/cloudflare` 14.x)
