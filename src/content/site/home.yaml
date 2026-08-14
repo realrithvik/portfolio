@@ -1,12 +1,10 @@
-greeting: Hello! I'm
+greeting: Hi! I'm
 nameLead: R
 nameRest: thvik
 nameSpoken: Rithvik
 pronunciation: Ri-thvik
-tagline: |-
-  I design stories through shape, type, and interaction.
-  Every story starts from a single dot.
-dotHint: The dot is my thought
+tagline: I love communicating your story.
+dotHint: Click the dot for more
 workTitle: Selected work
 workIntro: '{count} projects, told as stories. Click any one to scroll through.'
 workEmpty: New work is on its way.
