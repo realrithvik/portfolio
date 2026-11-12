@@ -906,19 +906,6 @@ body.thought-open .site-header {
   display: block;
 }
 
-/* Flips the route so the dot comes to rest over the copy rather than behind the
-   last chapter's image card. Applied in CSS, so the measured user-space
-   coordinates stay untouched. */
-.story-scene--mirrored .story-scene__svg {
-  transform: scaleX(-1);
-}
-
-/* The route is measured, never drawn. */
-.story-scene__centerline {
-  fill: none;
-  stroke: none;
-}
-
 .story-scene__ember {
   fill: var(--color-pink);
 }
@@ -939,7 +926,7 @@ body.thought-open .site-header {
 
 /* Out of focus in the distance, resolving as it arrives. */
 .story-scene__traveller {
-  filter: blur(calc((1 - var(--traveller-depth, 0)) * 7px));
+  filter: blur(calc((1 - var(--traveller-depth, 0)) * 1.5px));
 }
 
 @keyframes story-dot-flicker {
@@ -992,49 +979,35 @@ body.thought-open .site-header {
    Scoped to a class the script adds, so if it never runs the story is simply
    visible rather than blank. */
 
-.story-reveal .chapter__gallery,
-.story-reveal .chapter__content-inner {
-  opacity: 0;
-  transition:
-    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
+/* Image and copy share the travelling dot's scroll timeline. */
 .story-reveal .chapter__gallery {
-  transform: scale(1.05);
+  opacity: var(--image-reveal, 1);
+  transform: translateY(calc((1 - var(--image-reveal, 1)) * 36px)) scale(calc(0.88 + var(--image-reveal, 1) * 0.12));
 }
-
 .story-reveal .chapter__content-inner {
-  transform: translateY(28px);
+  opacity: var(--copy-reveal, 1);
+  transform: translateY(calc((1 - var(--copy-reveal, 1)) * 24px));
 }
-
-.story-reveal .chapter.is-revealed .chapter__gallery,
-.story-reveal .chapter.is-revealed .chapter__content-inner {
-  opacity: 1;
-  transform: none;
+.story-reveal .chapter:focus-within .chapter__gallery,
+.story-reveal .chapter:focus-within .chapter__content-inner { opacity: 1; transform: none; }
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .story-reveal .chapter { min-height: calc(var(--chapter-height, 100vh) + 65vh); }
+  .story-reveal .chapter__layout {
+    position: sticky;
+    top: var(--chapter-top, 0px);
+    min-height: var(--chapter-height, 100vh);
+  }
+  .story-reveal .chapter__visual { position: relative; align-self: center; }
 }
-
-/* The copy trails the image slightly, so the beat lands in two steps. */
-.story-reveal .chapter__content-inner {
-  transition-delay: 0.12s;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .story-reveal .chapter__gallery,
-  .story-reveal .chapter__content-inner {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
-  .story-scene {
-    transition: none;
-  }
-
-  .story-scene__traveller-dot,
-  .story-scene__traveller-bloom {
-    animation: none;
-  }
+  .story-reveal .chapter__content-inner { opacity: 1; transform: none; }
+  .story-scene { display: none; }
+}
+@media print {
+  .story-reveal .chapter__gallery,
+  .story-reveal .chapter__content-inner { opacity: 1; transform: none; }
+  .story-scene { display: none; }
 }
 
 .story {
