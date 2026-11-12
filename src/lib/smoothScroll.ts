@@ -38,11 +38,13 @@ export function initSmoothScroll() {
     (window as unknown as { __lenis?: Lenis | null }).__lenis = lenis;
   }
 
-  // body.thought-open sets overflow:hidden; stop Lenis so it isn't fighting a
-  // locked page, and resume when the overlay closes.
+  // Both of these set overflow:hidden on the body; stop Lenis so it isn't
+  // fighting a locked page, and resume when the overlay closes.
+  const LOCKING_CLASSES = ['thought-open', 'lightbox-open'];
   observer = new MutationObserver(() => {
     if (!lenis) return;
-    if (document.body.classList.contains('thought-open')) lenis.stop();
+    const locked = LOCKING_CLASSES.some((name) => document.body.classList.contains(name));
+    if (locked) lenis.stop();
     else lenis.start();
   });
   observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });

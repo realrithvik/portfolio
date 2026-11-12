@@ -10,27 +10,11 @@ const contact = await getContact();
     <h1 class="page-title">{contact.title}</h1>
     <p class="page-intro">{contact.intro}</p>
 
-    <form class="contact-form" action={`mailto:${contact.email}`} method="post" enctype="text/plain">
-      <label>
-        Your name
-        <input type="text" name="name" required placeholder="What should I call you?" />
-      </label>
-      <label>
-        Email
-        <input type="email" name="email" required placeholder="you@example.com" />
-      </label>
-      <label>
-        Message
-        <textarea name="message" rows="5" required placeholder="Tell me what's on your mind..."></textarea>
-      </label>
-      <button type="submit" class="btn btn--accent">
-        <span class="dot" aria-hidden="true"></span>
-        {contact.submitLabel}
-      </button>
-    </form>
-
-    <p class="contact-aside">
-      {contact.asidePrefix} <a href={`mailto:${contact.email}`}>{contact.email}</a>
-    </p>
+    <div class="page-actions contact-actions">
+      <a href={`mailto:${contact.email}`} class="btn btn--accent">{contact.emailLabel}</a>
+      <a href={contact.linkedInUrl} class="btn">{contact.linkedInLabel}</a>
+      <a href={contact.resumeUrl} class="btn">{contact.resumeLabel}</a>
+    </div>
+    <p class="contact-aside"><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
   </section>
 </PageLayout>

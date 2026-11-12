@@ -32,8 +32,20 @@ const projects = defineCollection({
     tags: z.array(z.string()).default([]),
     accent: z.string(),
     heroImage: z.string().nullable().default(null),
+    featured: z.boolean().default(true),
     chapters: z
-      .array(z.object({ title: z.string(), body: z.string() }))
+      .array(
+        z.object({
+          title: z.string(),
+          // Entries written before the stage field existed still validate.
+          stage: z.enum(['research', 'process', 'outcome']).default('research'),
+          body: z.string(),
+          figures: z.array(z.object({ value: z.string(), label: z.string() })).default([]),
+          images: z
+            .array(z.object({ src: z.string(), caption: z.string().default('') }))
+            .default([]),
+        }),
+      )
       .default([]),
   }),
 });
@@ -49,6 +61,7 @@ export const collections = {
     pronunciation: z.string(),
     tagline: z.string(),
     dotHint: z.string(),
+    workCta: z.string(),
     workTitle: z.string(),
     workIntro: z.string(),
     workEmpty: z.string(),
@@ -69,8 +82,11 @@ export const collections = {
     title: z.string(),
     intro: z.string(),
     email: z.string(),
-    asidePrefix: z.string(),
-    submitLabel: z.string(),
+    emailLabel: z.string(),
+    linkedInUrl: z.string().url(),
+    linkedInLabel: z.string(),
+    resumeUrl: z.string(),
+    resumeLabel: z.string(),
   }),
 
   thoughtProcess: site('thought-process.yaml', {

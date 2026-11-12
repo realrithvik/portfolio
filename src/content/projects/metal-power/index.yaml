@@ -1,0 +1,39 @@
+title: Metal Power Analytical
+hook: A visual identity system and 34-page brand book informed by spectrometry.
+year: '2026'
+role: Brand strategy and design
+tags: [Brand identity, Guidelines, B2B]
+accent: '#e8c96b'
+heroImage: /images/projects/metal-power/hero.png
+chapters:
+  - title: Finding the visual direction
+    stage: research
+    body: >-
+      I led the brand book from positioning through the final guidelines. I looked
+      to spectrometry, the process at the heart of Metal Power’s work, to develop
+      a palette with distinct roles for the logo, graphic strokes, and gradient.
+    images:
+      - src: /images/projects/metal-power/colour.png
+        caption: Brand book mockup showing the spectrum palette and logo colours
+  - title: Making the strokes work
+    stage: process
+    body: >-
+      I drew the graphic strokes from the angles of the logomark. When I pitched
+      the identity, the Metal Power team wasn’t sold on the lines. I refined how
+      they sit around photography so the lines support the composition and the
+      image stays clear. That treatment carried through to LinkedIn posts.
+    images:
+      - src: /images/projects/metal-power/strokes.png
+        caption: Brand book mockup showing the stroke construction and usage rules
+  - title: Writing the guidelines
+    stage: outcome
+    body: >-
+      I documented how to use the palette, typography, and strokes across
+      digital and print, with examples for social posts and stationery. The
+      finished book gives the team a reference for applying the identity to new work.
+    figures:
+      - value: '34'
+        label: Pages of brand guidelines
+    images:
+      - src: /images/projects/metal-power/hero.png
+        caption: Closed cover mockup of the Metal Power Analytical brand book

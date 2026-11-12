@@ -1,0 +1,29 @@
+title: Salira
+hook: A custom display typeface in development for Salira Design Agency.
+year: '2026'
+role: Type design
+tags: [Typography, Work in progress]
+accent: '#e491c9'
+heroImage: /images/projects/salira/hero.png
+chapters:
+  - title: Refining the Bold draft
+    stage: process
+    body: >-
+      The brief was to retain the expressive character the agency liked in TAN
+      Mon Cheri while improving legibility. I used AI to help build the initial
+      outlines. The Bold draft still has a pinched join on A, a small spike on M,
+      and a gap in R. I’m refining these details as I develop the typeface.
+    images:
+      - src: /images/projects/salira/regular.png
+        caption: A, M and R in Salira Regular
+      - src: /images/projects/salira/bold.png
+        caption: A, M and R in the Salira Bold working draft
+  - title: The current specimen
+    stage: process
+    body: >-
+      Regular and Bold are working drafts with uppercase letters and numerals.
+      I’m refining joins and stroke weights before checking spacing and kerning
+      across both styles. Dedicated lowercase and italics are planned.
+    images:
+      - src: /images/projects/salira/specimen.png
+        caption: Current uppercase and numeral drawings in Regular and Bold

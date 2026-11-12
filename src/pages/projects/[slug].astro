@@ -1,6 +1,8 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
 import StoryChapter from '../../components/StoryChapter.astro';
+import StoryScene from '../../components/StoryScene.astro';
+import Lightbox from '../../components/Lightbox.astro';
 import { chapterId, getProject, getProjectsSorted } from '../../lib/content';
 
 export async function getStaticPaths() {
@@ -18,27 +20,37 @@ if (!project) {
 }
 
 const heroImage = project.heroImage ?? `/images/${project.slug}/hero.jpg`;
+
+const firstChapter = project.chapters[0];
+const openingAnchor = firstChapter ? chapterId(firstChapter.title, 0) : null;
+const openingStage = firstChapter?.stage ?? 'research';
 ---
 
 <PageLayout title={`${project.title} — Rithvik A Koundinya`} description={project.hook}>
-  <div class="project-story">
-    <header class="project-hero">
-      <div class="project-hero__image">
+  <div class="project-story" style={`--project-accent: ${project.accent}`}>
+    <header class="project-cover">
+      <div class="project-cover__backdrop">
         <img
           src={heroImage}
-          alt={project.title}
-          class="project-hero__img"
+          alt=""
+          class="project-cover__img"
           loading="eager"
         />
-        <div class="project-hero__image-placeholder" aria-hidden="true">
-          <span>{project.title}</span>
-        </div>
+        <div class="project-cover__img-placeholder" aria-hidden="true"></div>
       </div>
 
-      <div class="project-hero__content">
-        <a href="/#work" class="btn">← Back to work</a>
-        <h1 class="page-title">{project.title}</h1>
-        <div class="project-hero__meta">
+      <div class="project-cover__inner">
+        <a href="/#work" class="project-cover__back">← Back to work</a>
+
+        <span class="project-cover__label">
+          <span class="dot" aria-hidden="true"></span>
+          Cover
+        </span>
+
+        <h1 class="project-cover__title">{project.title}</h1>
+        <p class="project-cover__hook">{project.hook}</p>
+
+        <div class="project-cover__meta">
           <span class="tag">{project.year}</span>
           <span class="tag">{project.role}</span>
           {
@@ -47,9 +59,19 @@ const heroImage = project.heroImage ?? `/images/${project.slug}/hero.jpg`;
             ))
           }
         </div>
-        <p class="project-hero__hook">{project.hook}</p>
       </div>
+
+      {
+        openingAnchor && (
+          <a href={`#${openingAnchor}`} class="project-cover__cue">
+            <span>Explore {openingStage}</span>
+            <span class="project-cover__cue-arrow" aria-hidden="true" />
+          </a>
+        )
+      }
     </header>
+
+    <StoryScene />
 
     <div class="story">
       {
@@ -58,12 +80,17 @@ const heroImage = project.heroImage ?? `/images/${project.slug}/hero.jpg`;
             index={index}
             id={chapterId(chapter.title, index)}
             title={chapter.title}
+            stage={chapter.stage}
             body={chapter.body}
+            figures={chapter.figures}
+            images={chapter.images}
             projectSlug={project.slug}
           />
         ))
       }
     </div>
+
+    <Lightbox />
 
     <section class="project-outro">
       <p>That's the story. Ready for the next one?</p>
@@ -75,7 +102,189 @@ const heroImage = project.heroImage ?? `/images/${project.slug}/hero.jpg`;
 <script>
   import { initImageFallbacks } from '../../lib/imageFallback';
 
-  const init = () => initImageFallbacks('.project-hero__img');
+  function initCoverImage() {
+    initImageFallbacks('.project-cover__img');
+  }
+
+  /**
+   * Carries the dot along an invisible route as the reader scrolls, trailing a
+   * comet tail behind it. Progress is measured against the centre of each
+   * chapter, so the dot reaches each beat as that beat is centred and comes to
+   * rest on the last one — not at the foot of the page, since the outro sits
+   * below the story and the reading line can never reach the true bottom.
+   */
+  function initStoryScene() {
+    const scene = document.querySelector<HTMLElement>('.story-scene');
+    const story = document.querySelector<HTMLElement>('.story');
+    const chapters = [...document.querySelectorAll<HTMLElement>('.chapter[data-stage]')];
+    if (!scene || !story || chapters.length === 0) return;
+
+    const centerline = scene.querySelector('.story-scene__centerline') as SVGPathElement | null;
+    const traveller = scene.querySelector('.story-scene__traveller') as SVGGElement | null;
+    if (!centerline || !traveller) return;
+
+    const embers = [...scene.querySelectorAll<SVGCircleElement>('.story-scene__ember')];
+    let pathLength = centerline.getTotalLength();
+    let frame = 0;
+
+    /**
+     * The route runs past the bottom edge, but the dot must come to rest
+     * somewhere visible — it travels this fraction and stops in the foreground.
+     */
+    const TRAVEL = 0.8;
+    /** How much of the travelled route the tail spans at full length. */
+    const TAIL = 0.17;
+
+    const lengthAt = (p: number) => pathLength * TRAVEL * p;
+    /** Speck at the horizon, full size up close. */
+    const scaleAt = (p: number) => 0.16 + 0.84 * p ** 1.5;
+
+    /**
+     * The dot has to finish somewhere it can actually be seen. It is travelling
+     * behind the image cards, so if its resting point falls on the same side as
+     * the last chapter's card it would arrive hidden. Mirroring the whole route
+     * puts it over the copy column instead. Read from the rendered layout
+     * rather than from chapter parity, so this stays correct if the mirroring
+     * rule for chapters ever changes.
+     */
+    const orientRoute = () => {
+      const svg = centerline.ownerSVGElement;
+      if (!svg) return;
+      const centreX = svg.viewBox.baseVal.width / 2;
+      const endsLeft = centerline.getPointAtLength(lengthAt(1)).x < centreX;
+      const lastChapter = chapters[chapters.length - 1];
+      const imageOnLeft = !lastChapter.classList.contains('chapter--flipped');
+      scene.classList.toggle('story-scene--mirrored', endsLeft === imageOnLeft);
+    };
+
+    const centreOf = (el: HTMLElement) => {
+      const rect = el.getBoundingClientRect();
+      return rect.top + rect.height / 2 + window.scrollY;
+    };
+
+    const update = () => {
+      const first = centreOf(chapters[0]);
+      const last = centreOf(chapters[chapters.length - 1]);
+      const reading = window.scrollY + window.innerHeight / 2;
+      const span = last - first;
+      const progress = Math.min(1, Math.max(0, span > 0 ? (reading - first) / span : 1));
+
+      const head = lengthAt(progress);
+      const point = centerline.getPointAtLength(head);
+      const scale = scaleAt(progress);
+
+      traveller.setAttribute(
+        'transform',
+        `translate(${point.x} ${point.y}) scale(${scale.toFixed(4)})`,
+      );
+      // Drives both the focus pull and the bloom strength in CSS.
+      traveller.style.setProperty('--traveller-depth', progress.toFixed(4));
+
+      // Grow the tail in as the dot sets off, so it does not start out with a
+      // full tail bunched up at the origin.
+      const tailLength = pathLength * TRAVEL * TAIL * Math.min(1, progress * 4);
+
+      embers.forEach((ember, i) => {
+        const k = (i + 1) / embers.length;
+        const at = Math.max(head - k * tailLength, 0);
+        const emberPoint = centerline.getPointAtLength(at);
+        ember.setAttribute('cx', emberPoint.x.toFixed(1));
+        ember.setAttribute('cy', emberPoint.y.toFixed(1));
+        // Each ember is smaller and fainter than the one ahead of it, and the
+        // whole tail shrinks with distance exactly as the dot does.
+        const depth = scaleAt(progress * (1 - k * TAIL));
+        ember.setAttribute('r', (7 * depth * (1 - 0.62 * k)).toFixed(2));
+        ember.style.opacity = (0.5 * (1 - k) ** 1.7).toFixed(3);
+      });
+
+      // Only present while the story is: it has nothing to say over the cover.
+      const storyRect = story.getBoundingClientRect();
+      const inStory = storyRect.top < window.innerHeight * 0.5 && storyRect.bottom > 0;
+      scene.classList.toggle('is-active', inStory);
+    };
+
+    // Coalesce to one frame by replacing the pending callback rather than
+    // latching a boolean — a `ticking` flag never clears if rAF is paused
+    // (backgrounded tab), which would freeze the scene for the rest of the visit.
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+
+    const remeasure = () => {
+      pathLength = centerline.getTotalLength();
+      orientRoute();
+      update();
+    };
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', remeasure, { passive: true });
+    document.addEventListener('visibilitychange', schedule);
+    remeasure();
+  }
+
+  /**
+   * Images and copy fade up as each beat arrives. Gated on a root class so a
+   * failed script leaves everything visible rather than blank.
+   */
+  function initChapterReveal() {
+    const chapters = [...document.querySelectorAll<HTMLElement>('.chapter')];
+    if (chapters.length === 0) return;
+
+    document.documentElement.classList.add('story-reveal');
+
+    if (!('IntersectionObserver' in window)) {
+      chapters.forEach((chapter) => chapter.classList.add('is-revealed'));
+      return;
+    }
+
+    const reveal = (chapter: Element) => {
+      chapter.classList.add('is-revealed');
+      observer.unobserve(chapter);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // `top < 0` catches a beat that is already above the viewport on
+          // load — a deep link or a restored scroll position — which would
+          // otherwise never intersect and so stay blank forever.
+          if (entry.isIntersecting || entry.boundingClientRect.top < 0) reveal(entry.target);
+        });
+      },
+      { rootMargin: '0px 0px -18% 0px' },
+    );
+
+    chapters.forEach((chapter) => observer.observe(chapter));
+
+    /**
+     * A fast jump can carry a beat from below the fold to above it without the
+     * observer ever sampling a non-zero ratio, so nothing above the fold is
+     * left to chance: anything already scrolled past is shown outright.
+     */
+    let frame = 0;
+    const catchUp = () => {
+      chapters.forEach((chapter) => {
+        if (chapter.classList.contains('is-revealed')) return;
+        if (chapter.getBoundingClientRect().bottom < window.innerHeight) reveal(chapter);
+      });
+    };
+
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(catchUp);
+    };
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    document.addEventListener('visibilitychange', schedule);
+    catchUp();
+  }
+
+  function init() {
+    initCoverImage();
+    initStoryScene();
+    initChapterReveal();
+  }
 
   init();
   document.addEventListener('astro:page-load', init);

@@ -1,0 +1,51 @@
+---
+import { buildStoryPath } from '../lib/storyPath';
+
+const { centerline, viewBox } = buildStoryPath();
+
+/**
+ * Embers making up the comet tail. They are positioned along the invisible
+ * route behind the dot, shrinking and fading as they go, then blurred as a
+ * group — so the tail is a smear of light rather than a drawn line.
+ */
+const EMBERS = 18;
+
+/*
+ * One layer, sitting above the page. The tail reads as background because it is
+ * heavily blurred and faint, not because it is painted underneath: putting it
+ * on a lower layer would let the image cards slice a hard edge through it, and
+ * the dot has to finish in front of a card regardless.
+ *
+ * `meet`, not `slice`: slicing crops the viewBox vertically on a widescreen
+ * viewport, cutting off the vanishing point and the near end.
+ */
+---
+
+<div class="story-scene" aria-hidden="true">
+  <svg class="story-scene__svg" viewBox={viewBox} preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <filter id="story-scene-comet" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="9" />
+      </filter>
+      <filter id="story-scene-bloom" x="-300%" y="-300%" width="700%" height="700%">
+        <feGaussianBlur stdDeviation="10" />
+      </filter>
+    </defs>
+
+    {/* Measured only — the route is never drawn. */}
+    <path class="story-scene__centerline" d={centerline} />
+
+    <g class="story-scene__comet" filter="url(#story-scene-comet)">
+      {
+        Array.from({ length: EMBERS }, (_, i) => (
+          <circle class="story-scene__ember" data-ember={i} r="7" cx="0" cy="0" />
+        ))
+      }
+    </g>
+
+    <g class="story-scene__traveller">
+      <circle class="story-scene__traveller-bloom" r="26" filter="url(#story-scene-bloom)" />
+      <circle class="story-scene__traveller-dot" r="9" />
+    </g>
+  </svg>
+</div>

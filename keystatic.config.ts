@@ -11,6 +11,16 @@ const ACCENT_OPTIONS = [
   { label: 'Orchid', value: '#b835b0' },
 ] as const;
 
+/**
+ * The arc every project is told through — same three words the printed portfolio
+ * tags its pages with. Rendered as the corner label and the progress rail.
+ */
+const STORY_STAGES = [
+  { label: 'Research', value: 'research' },
+  { label: 'Process', value: 'process' },
+  { label: 'Outcome', value: 'outcome' },
+] as const;
+
 /** Each value maps to a hand-drawn SVG in src/components/ThoughtIcons.astro. */
 const THOUGHT_ICONS = [
   { label: 'Eye (read)', value: 'read' },
@@ -90,10 +100,50 @@ export default config({
           directory: 'public/images/projects',
           publicPath: '/images/projects/',
         }),
+        featured: fields.checkbox({ label: 'Show in Selected work', defaultValue: true }),
         chapters: fields.array(
           fields.object({
             title: fields.text({ label: 'Chapter title', validation: { isRequired: true } }),
+            stage: fields.select({
+              label: 'Stage',
+              description: 'Where this beat sits in the arc. Shown as the corner tag.',
+              options: [...STORY_STAGES],
+              defaultValue: 'research',
+            }),
             body: prose('Body', 'Leave a blank line between paragraphs.'),
+            figures: fields.array(
+              fields.object({
+                value: fields.text({ label: 'Figure', validation: { isRequired: true } }),
+                label: fields.text({ label: 'Caption', validation: { isRequired: true } }),
+              }),
+              {
+                label: 'Figures',
+                description:
+                  'Optional. Numbers that carry the idea — set large, before the body copy.',
+                itemLabel: (p) => `${p.fields.value.value} — ${p.fields.label.value}`,
+              },
+            ),
+            images: fields.array(
+              fields.object({
+                src: fields.image({
+                  label: 'Image',
+                  directory: 'public/images/projects',
+                  publicPath: '/images/projects/',
+                  validation: { isRequired: true },
+                }),
+                caption: fields.text({
+                  label: 'Caption',
+                  description: 'Optional. Shown when the image is opened full size.',
+                }),
+              }),
+              {
+                label: 'Images',
+                description:
+                  'Shown as cards beside the copy. Click one on the site to open it big. ' +
+                  'Leave empty and the chapter falls back to its typographic placeholder.',
+                itemLabel: (p) => p.fields.caption.value || 'Image',
+              },
+            ),
           }),
           {
             label: 'Chapters',
@@ -140,8 +190,7 @@ export default config({
         }),
         nameSpoken: fields.text({
           label: 'Name — as read aloud',
-          description:
-            'What screen readers announce. The visible name drops the "i" because the dot is the vocalic R, so this needs spelling out in full.',
+          description: 'What screen readers announce.',
           validation: { isRequired: true },
         }),
         pronunciation: fields.text({
@@ -153,6 +202,7 @@ export default config({
           label: 'Dot hint',
           description: 'The small italic nudge that fades in under the tagline.',
         }),
+        workCta: fields.text({ label: 'View work button' }),
         workTitle: fields.text({ label: 'Work — heading' }),
         workIntro: prose(
           'Work — intro',
@@ -199,11 +249,14 @@ export default config({
         intro: prose('Intro'),
         email: fields.text({
           label: 'Email address',
-          description: 'Used by the form, the footer, and the link below the form.',
+          description: 'Shown as a direct email link.',
           validation: { isRequired: true },
         }),
-        asidePrefix: fields.text({ label: 'Text before the email link' }),
-        submitLabel: fields.text({ label: 'Send button label' }),
+        emailLabel: fields.text({ label: 'Email button label' }),
+        linkedInUrl: fields.url({ label: 'LinkedIn profile' }),
+        linkedInLabel: fields.text({ label: 'LinkedIn link label' }),
+        resumeUrl: fields.text({ label: 'Résumé file path' }),
+        resumeLabel: fields.text({ label: 'Résumé link label' }),
       },
     }),
 

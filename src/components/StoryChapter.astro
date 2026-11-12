@@ -1,35 +1,82 @@
 ---
 import ListenButton from './ListenButton.astro';
 
+export type Stage = 'research' | 'process' | 'outcome';
+
 interface Props {
   index: number;
   id: string;
   title: string;
+  stage: Stage;
   body: string;
+  figures?: { value: string; label: string }[];
+  images?: { src: string; caption?: string }[];
   projectSlug: string;
 }
 
-const { index, id, title, body, projectSlug } = Astro.props;
+const { index, id, title, stage, body, figures = [], images = [], projectSlug } = Astro.props;
 const chapterNumber = String(index + 1).padStart(2, '0');
 const plainText = body.replace(/\n\n/g, ' ').trim();
-const imagePath = `/images/${projectSlug}/${id}.jpg`;
+// Every other beat mirrors, so the eye never settles into the template.
+const flipped = index % 2 === 1;
+
+// With nothing uploaded yet, fall back to the drop-a-file-in-place convention so
+// the column still reads as a card rather than going blank.
+const cards = images.length
+  ? images
+  : [{ src: `/images/${projectSlug}/${id}.jpg`, caption: '' }];
+// Past three, the tiles get too small to be worth looking at before you click.
+const layoutCount = Math.min(cards.length, 3);
 ---
 
-<article class="chapter" id={id} data-chapter={id}>
+<article
+  class:list={['chapter', flipped && 'chapter--flipped']}
+  id={id}
+  data-chapter={id}
+  data-stage={stage}
+>
   <div class="chapter__layout">
     <div class="chapter__visual">
-      <div class="chapter__image-wrap">
-        <img
-          src={imagePath}
-          alt={`${title} — visual`}
-          class="chapter__image"
-          loading="lazy"
-        />
-        <div class="chapter__image-placeholder">
-          <span class="chapter__placeholder-label">{title}</span>
-          <span class="chapter__placeholder-hint">public/images/{projectSlug}/{id}.jpg</span>
-        </div>
-      </div>
+      <ul class="chapter__gallery" data-count={layoutCount} data-gallery={id}>
+        {
+          cards.map((card, cardIndex) => (
+            <li
+              class="chapter__gallery-item"
+              style={`--i: ${cardIndex}; --n: ${cards.length}`}
+            >
+              <button
+                type="button"
+                class="gallery-card"
+                data-full={card.src}
+                data-caption={card.caption ?? ''}
+                data-alt={card.caption || `${title} — image ${cardIndex + 1}`}
+                aria-label={`Open ${card.caption || `${title} image ${cardIndex + 1}`} full size`}
+              >
+                <img
+                  src={card.src}
+                  alt={card.caption || `${title} — image ${cardIndex + 1}`}
+                  class="chapter__image"
+                  loading="lazy"
+                />
+                {/* Immediately after the img: imageFallback pairs each image
+                    with its nextElementSibling. */}
+                <div class="chapter__image-placeholder">
+                  <span class="chapter__placeholder-label">{title}</span>
+                  <span class="chapter__placeholder-hint">{card.src}</span>
+                </div>
+                {cards.length > 1 && (
+                  <span class="gallery-card__index" aria-hidden="true">
+                    {cardIndex + 1}.
+                  </span>
+                )}
+                <span class="gallery-card__zoom" aria-hidden="true" />
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+
+      <span class="chapter__stage-tag">{stage}</span>
     </div>
 
     <div class="chapter__content">
@@ -44,6 +91,19 @@ const imagePath = `/images/${projectSlug}/${id}.jpg`;
 
         <h2 class="chapter__title">{title}</h2>
 
+        {
+          figures.length > 0 && (
+            <dl class="chapter__figures">
+              {figures.map((figure) => (
+                <div class="chapter__figure">
+                  <dt class="chapter__figure-value">{figure.value}</dt>
+                  <dd class="chapter__figure-label">{figure.label}</dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+
         <div class="chapter__body">
           {
             body.split('\n\n').map((paragraph) => (
@@ -54,6 +114,7 @@ const imagePath = `/images/${projectSlug}/${id}.jpg`;
       </div>
     </div>
   </div>
+
 </article>
 
 <script>

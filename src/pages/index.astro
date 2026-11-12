@@ -1,21 +1,20 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import ThoughtProcess from '../components/ThoughtProcess.astro';
-import ScrollArrowCTA from '../components/ScrollArrowCTA.astro';
 import Fireflies from '../components/Fireflies.astro';
 import FireflyJar from '../components/FireflyJar.astro';
 import { getHome, getProjectsSorted, renderInline } from '../lib/content';
 
 const home = await getHome();
-const featured = await getProjectsSorted();
+const featured = (await getProjectsSorted()).filter((project) => project.featured);
 
 const cardNumber = (index: number) => String(index + 1).padStart(2, '0');
 const workIntro = home.workIntro.replace('{count}', String(featured.length));
 ---
 
 <PageLayout
-  title="Rithvik A Koundinya — Designer"
-  description="A warm, story-driven design portfolio."
+  title={`${home.nameSpoken} A Koundinya — Communication Designer`}
+  description={home.tagline}
 >
   <Fireflies />
   <FireflyJar />
@@ -65,15 +64,14 @@ const workIntro = home.workIntro.replace('{count}', String(featured.length));
           }
         </p>
 
+        <a href="#work" class="btn btn--accent hero__work-link">{home.workCta}</a>
+
         <p class="hero__hint" id="hero-hint" hidden>
           <em>{home.dotHint}</em>
         </p>
       </div>
     </div>
 
-    <div class="hero__bottom">
-      <ScrollArrowCTA href="#work" label="Explore work" explore arrowFirst />
-    </div>
   </section>
 
   <ThoughtProcess />
@@ -86,31 +84,29 @@ const workIntro = home.workIntro.replace('{count}', String(featured.length));
 
     {
       featured.length > 0 && (
-        <div class="work-grid" role="list">
+        <ul class="work-grid" role="list">
           {featured.map((project, index) => (
+            <li>
             <a
               href={`/projects/${project.slug}`}
               class="work-card"
-              role="listitem"
               style={`--card-accent: ${project.accent}`}
             >
               <div class="work-card__image">
-                <img
-                  src={project.heroImage ?? `/images/${project.slug}/hero.jpg`}
-                  alt={project.title}
+                {project.heroImage && <img
+                  src={project.heroImage}
+                  alt=""
                   class="work-card__img"
                   loading="lazy"
-                />
+                />}
                 <div class="work-card__placeholder" aria-hidden="true">
                   <span class="work-card__ph-index">{cardNumber(index)}</span>
                   <span class="work-card__ph-rule" />
                   <span class="work-card__ph-word">{project.tags[0]}</span>
                 </div>
-                <div class="work-card__mono" aria-hidden="true" />
               </div>
 
               <div class="work-card__body">
-                <span class="work-card__number">{cardNumber(index)}</span>
                 <h3>{project.title}</h3>
                 <p class="work-card__hook">{project.hook}</p>
                 <div class="work-card__meta">
@@ -119,8 +115,9 @@ const workIntro = home.workIntro.replace('{count}', String(featured.length));
                 </div>
               </div>
             </a>
+            </li>
           ))}
-        </div>
+        </ul>
       )
     }
   </section>
@@ -311,36 +308,6 @@ const workIntro = home.workIntro.replace('{count}', String(featured.length));
   initHeroIntroDim();
   initHeroDotProximity();
   document.addEventListener('astro:page-load', initHeroDotLayout);
-
-  function initHeroScrollCta() {
-    const heroBottom = document.querySelector<HTMLElement>('.hero__bottom');
-    if (!heroBottom) return;
-
-    const threshold = 48;
-
-    const update = () => {
-      heroBottom.classList.toggle('is-scrolled-away', window.scrollY > threshold);
-    };
-
-    let ticking = false;
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          update();
-          ticking = false;
-        });
-      },
-      { passive: true },
-    );
-
-    update();
-  }
-
-  initHeroScrollCta();
-  document.addEventListener('astro:page-load', initHeroScrollCta);
 
   // The dot opens the thought overlay, but nothing says so. Nudge once, then
   // never again — mirrors the localStorage guard in lib/fireflies.ts.

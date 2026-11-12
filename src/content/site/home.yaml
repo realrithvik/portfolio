@@ -1,24 +1,27 @@
 greeting: Hello! I'm
 nameLead: R
-nameRest: thvik
+nameRest: ithvik
 nameSpoken: Rithvik
 pronunciation: Ri-thvik
-tagline: I love communicating your story.
-dotHint: Click the dot for more
+tagline: >-
+  I’m a senior communication designer and team lead working across brand identity,
+  typography, and digital experiences.
+dotHint: Click the dot to see how I think
+workCta: View work
 workTitle: Selected work
-workIntro: '{count} projects, told as stories. Click any one to scroll through.'
+workIntro: Brand identities, editorial work, and type in development.
 workEmpty: New work is on its way.
 capabilitiesTitle: What I do
 capabilitiesIntro: >-
   A communication designer working across print and screen — usually starting
   with research, always ending with a story.
 capabilities:
+  - title: Brand & identity
+    note: Visual direction, design systems, and guidelines a team can use.
   - title: Editorial & print
     note: Books, brochures, and folded objects that reward handling.
   - title: Typography
     note: Type as the argument — weight, rhythm, spacing, and silence.
-  - title: Brand & identity
-    note: Systems built from a single idea, carried across every touchpoint.
   - title: Interaction
     note: Prototypes and interactive documents people can explore themselves.
   - title: Research

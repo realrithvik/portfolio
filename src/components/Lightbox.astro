@@ -1,0 +1,138 @@
+---
+/**
+ * One viewer for the whole page. Any `.gallery-card` button opens it, and the
+ * arrows step through that card's own gallery rather than every image on the
+ * page — moving from the last image of one chapter into the next chapter's
+ * first would jump the reader out of the beat they are looking at.
+ */
+---
+
+<div class="lightbox" id="lightbox" hidden>
+  <div class="lightbox__backdrop" data-lightbox-close></div>
+
+  <div class="lightbox__dialog" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button type="button" class="lightbox__close" data-lightbox-close aria-label="Close viewer">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+    </button>
+
+    <button type="button" class="lightbox__nav lightbox__nav--prev" aria-label="Previous image">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+    </button>
+
+    <figure class="lightbox__figure">
+      <div class="lightbox__frame">
+        <img class="lightbox__img" src="" alt="" />
+        <div class="lightbox__placeholder" aria-hidden="true">
+          <span>Image not uploaded yet</span>
+        </div>
+      </div>
+      <figcaption class="lightbox__caption"></figcaption>
+    </figure>
+
+    <button type="button" class="lightbox__nav lightbox__nav--next" aria-label="Next image">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  function initLightbox() {
+    const root = document.getElementById('lightbox');
+    if (!root) return;
+
+    const img = root.querySelector<HTMLImageElement>('.lightbox__img');
+    const placeholder = root.querySelector<HTMLElement>('.lightbox__placeholder');
+    const caption = root.querySelector<HTMLElement>('.lightbox__caption');
+    const closeButton = root.querySelector<HTMLButtonElement>('.lightbox__close');
+    const prevButton = root.querySelector<HTMLButtonElement>('.lightbox__nav--prev');
+    const nextButton = root.querySelector<HTMLButtonElement>('.lightbox__nav--next');
+    if (!img || !caption || !closeButton || !prevButton || !nextButton) return;
+
+    let group: HTMLButtonElement[] = [];
+    let current = 0;
+    let opener: HTMLElement | null = null;
+
+    const show = (index: number) => {
+      const card = group[index];
+      if (!card) return;
+      current = index;
+
+      const src = card.dataset.full ?? '';
+      const text = card.dataset.caption ?? '';
+
+      // Assume it loads; the error handler below corrects it if it doesn't.
+      if (placeholder) placeholder.style.display = 'none';
+      img.style.display = 'block';
+      img.src = src;
+      img.alt = card.dataset.alt ?? '';
+
+      caption.textContent = text;
+      caption.hidden = text === '';
+
+      const many = group.length > 1;
+      prevButton.hidden = !many;
+      nextButton.hidden = !many;
+    };
+
+    const step = (delta: number) => {
+      if (group.length < 2) return;
+      show((current + delta + group.length) % group.length);
+    };
+
+    const close = () => {
+      root.hidden = true;
+      document.body.classList.remove('lightbox-open');
+      document.removeEventListener('keydown', onKeydown);
+      img.src = '';
+      opener?.focus();
+      opener = null;
+    };
+
+    function onKeydown(event: KeyboardEvent) {
+      if (event.key === 'Escape') close();
+      else if (event.key === 'ArrowLeft') step(-1);
+      else if (event.key === 'ArrowRight') step(1);
+    }
+
+    const open = (card: HTMLButtonElement) => {
+      // Siblings within the same chapter gallery, in document order.
+      const gallery = card.closest('.chapter__gallery');
+      group = gallery
+        ? [...gallery.querySelectorAll<HTMLButtonElement>('.gallery-card')]
+        : [card];
+
+      opener = card;
+      root.hidden = false;
+      document.body.classList.add('lightbox-open');
+      document.addEventListener('keydown', onKeydown);
+      show(Math.max(0, group.indexOf(card)));
+      closeButton.focus();
+    };
+
+    // A missing file should show the same "not uploaded" state as the cards do,
+    // rather than a broken-image icon.
+    img.addEventListener('error', () => {
+      img.style.display = 'none';
+      if (placeholder) placeholder.style.display = 'flex';
+    });
+
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+
+      const card = target.closest<HTMLButtonElement>('.gallery-card');
+      if (card) {
+        open(card);
+        return;
+      }
+
+      if (root.hidden) return;
+      if (target.closest('[data-lightbox-close]')) close();
+      else if (target.closest('.lightbox__nav--prev')) step(-1);
+      else if (target.closest('.lightbox__nav--next')) step(1);
+    });
+  }
+
+  initLightbox();
+  document.addEventListener('astro:page-load', initLightbox);
+</script>

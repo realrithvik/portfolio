@@ -3,5 +3,8 @@ intro: >-
   Have a project in mind, or just want to chat about design? I'd love to hear from
   you.
 email: rithvik.koundinya@gmail.com
-asidePrefix: 'Or email directly:'
-submitLabel: Send message
+emailLabel: Email me
+linkedInUrl: https://www.linkedin.com/in/rithvik-koundinya/
+linkedInLabel: LinkedIn
+resumeUrl: /rithvik-koundinya-resume.pdf
+resumeLabel: Résumé (PDF)

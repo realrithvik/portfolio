@@ -1,0 +1,41 @@
+title: Suvanya
+hook: A visual identity and packaging system for more than 40 personal care products.
+year: '2026'
+role: Brand and packaging design
+tags: [Brand identity, Packaging, Art direction]
+accent: '#e8c96b'
+heroImage: /images/projects/suvanya/hero.jpeg
+chapters:
+  - title: Choosing a direction
+    stage: research
+    body: >-
+      I started with market research and explored names and visual directions
+      for Suvanya. I developed three directions drawn from Bauhaus, Art Nouveau,
+      and Impressionism. The client chose the Bauhaus direction, which gave me
+      a geometric language to work with across the range.
+    images:
+      - src: /images/projects/suvanya/directions.png
+        caption: Naming exploration and three visual directions
+  - title: Designing for a full range
+    stage: process
+    body: >-
+      I drew icons for five product categories and developed orange-based
+      gradients to tell them apart. The range included boxes and containers of
+      different dimensions, so I adapted the sticker layout to each format while
+      keeping the system consistent.
+    images:
+      - src: /images/projects/suvanya/system.png
+        caption: Product category icons and packaging label variations
+  - title: Bringing the system together
+    stage: outcome
+    body: >-
+      The finished system connects the products through colour and type while
+      giving each category a distinct icon and gradient.
+    figures:
+      - value: 40+
+        label: Products across five categories
+    images:
+      - src: /images/projects/suvanya/hero.jpeg
+        caption: Suvanya packaging range
+      - src: /images/projects/suvanya/stationery.jpeg
+        caption: Suvanya identity applied to stationery
